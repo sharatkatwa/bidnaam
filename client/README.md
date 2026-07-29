@@ -46,7 +46,7 @@ src/
 | `auth` | FR1, FR2 | ✅ Login + Register, real form, persisted session |
 | `profile` | FR3 | ✅ Stats, bid history, my auctions |
 | `auction-create` | FR4 | ✅ Listing form with live preview card |
-| `auction-discovery` | FR5, FR6 | ✅ Filterable grid of auction cards |
+| `auction-discovery` | FR5, FR6 | ✅ Filterable grid + Auction Details page (pre-room landing, auth-aware CTA) |
 | `auction-room` | FR7, FR9, FR14, FR15, FR16 | ✅ Bidding UI, timer, heat meter, timeline, chat |
 | `spectator` | FR8 | ✅ Read-only room view (no bid controls), same live data + chat |
 | `chat` | FR17 | ✅ `ChatPanel` embedded in auction-room + spectator |
