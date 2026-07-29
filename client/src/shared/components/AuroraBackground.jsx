@@ -6,25 +6,32 @@ const REPEL_DISTANCE = 110;
 
 export default function AuroraBackground() {
   const canvasRef = useRef(null);
+  const orbLayerRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     let particles = [];
     let rafId;
     const mouse = { x: -9999, y: -9999 };
 
     function spawnParticles() {
-      const count = Math.min(60, Math.floor((window.innerWidth * window.innerHeight) / 26000));
+      const count = Math.min(
+        60,
+        Math.floor((window.innerWidth * window.innerHeight) / 26000),
+      );
       particles = Array.from({ length: count }, () => ({
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
         vx: (Math.random() - 0.5) * 0.25,
         vy: (Math.random() - 0.5) * 0.25,
         r: Math.random() * 1.6 + 1.2,
-        color: PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)],
+        color:
+          PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)],
       }));
     }
 
@@ -39,6 +46,12 @@ export default function AuroraBackground() {
     function handlePointerMove(e) {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
+
+      if (orbLayerRef.current) {
+        const x = (e.clientX / window.innerWidth - 0.5) * 40;
+        const y = (e.clientY / window.innerHeight - 0.5) * 40;
+        orbLayerRef.current.style.transform = `translate(${x}px, ${y}px)`;
+      }
     }
 
     function draw() {
@@ -100,7 +113,8 @@ export default function AuroraBackground() {
     draw();
 
     window.addEventListener("resize", resize);
-    if (!reduceMotion) window.addEventListener("pointermove", handlePointerMove);
+    if (!reduceMotion)
+      window.addEventListener("pointermove", handlePointerMove);
 
     return () => {
       cancelAnimationFrame(rafId);
@@ -112,6 +126,14 @@ export default function AuroraBackground() {
   return (
     <>
       <div className="aurora-bg" />
+
+      <div ref={orbLayerRef} className="orb-layer">
+        <div className="orb orb-gold" />
+        <div className="orb orb-cyan" />
+        <div className="orb orb-magenta" />
+        <div className="orb orb-small" />
+      </div>
+
       <canvas ref={canvasRef} className="constellation-canvas" />
       <div className="aurora-grain" />
     </>

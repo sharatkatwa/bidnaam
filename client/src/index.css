@@ -11,6 +11,7 @@
   --color-bid-orange: #ff6b3d;
   --color-bid-gold: #ffc94d;
   --color-bid-cyan: #4deeea;
+  --color-live-red: #ff3b4e;
 }
 
 body {
@@ -23,8 +24,97 @@ body {
 .aurora-bg {
   position: fixed;
   inset: 0;
-  z-index: -2;
+  z-index: -3;
   background: linear-gradient(135deg, var(--color-bid-violet) 0%, var(--color-bid-magenta) 55%, var(--color-bid-orange) 100%);
+}
+
+.orb-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  transition: transform 0.25s ease-out;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 9999px;
+}
+
+.orb-gold {
+  width: 240px;
+  height: 240px;
+  top: 10%;
+  left: 6%;
+  background: radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.95), rgba(255, 201, 77, 0.65) 42%, rgba(255, 201, 77, 0.05) 75%);
+  box-shadow: inset -20px -20px 46px rgba(0, 0, 0, 0.25), 0 26px 55px -16px rgba(0, 0, 0, 0.45);
+  animation: orb-bob-a 12s ease-in-out infinite;
+}
+
+.orb-cyan {
+  width: 170px;
+  height: 170px;
+  top: 64%;
+  left: 12%;
+  background: radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.9), rgba(77, 238, 234, 0.6) 42%, rgba(77, 238, 234, 0.05) 75%);
+  box-shadow: inset -14px -14px 34px rgba(0, 0, 0, 0.22), 0 20px 42px -14px rgba(0, 0, 0, 0.4);
+  animation: orb-bob-b 15s ease-in-out infinite;
+}
+
+.orb-magenta {
+  width: 300px;
+  height: 300px;
+  top: 18%;
+  right: 8%;
+  background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.85), rgba(255, 107, 61, 0.6) 42%, rgba(255, 107, 61, 0.04) 75%);
+  box-shadow: inset -24px -24px 55px rgba(0, 0, 0, 0.25), 0 30px 60px -18px rgba(0, 0, 0, 0.45);
+  animation: orb-bob-c 18s ease-in-out infinite;
+}
+
+.orb-small {
+  width: 110px;
+  height: 110px;
+  bottom: 8%;
+  right: 22%;
+  background: radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.35) 45%, rgba(255, 255, 255, 0.02) 75%);
+  box-shadow: inset -10px -10px 24px rgba(0, 0, 0, 0.2), 0 14px 30px -10px rgba(0, 0, 0, 0.35);
+  animation: orb-bob-b 10s ease-in-out infinite reverse;
+}
+
+@keyframes orb-bob-a {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(26px, -20px) scale(1.05);
+  }
+}
+
+@keyframes orb-bob-b {
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(-22px, 18px);
+  }
+}
+
+@keyframes orb-bob-c {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(-18px, 22px) scale(0.97);
+  }
 }
 
 .constellation-canvas {
@@ -77,6 +167,93 @@ body {
   }
 }
 
+/* ---------- Custom cursor ---------- */
+.cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 201, 77, 0.85), rgba(255, 201, 77, 0) 70%);
+  pointer-events: none;
+  z-index: 200;
+  mix-blend-mode: screen;
+  transition: transform 0.03s linear;
+  will-change: transform;
+}
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  pointer-events: none;
+  z-index: 200;
+  transition: transform 0.16s ease-out;
+  will-change: transform;
+}
+@media (pointer: coarse) {
+  .cursor-glow, .cursor-ring { display: none; }
+}
+
+/* ---------- Button shine sweep ---------- */
+.btn-shine::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+.btn-shine:hover::before {
+  left: 130%;
+}
+
+/* ---------- Nav link underline sweep ---------- */
+.link-underline {
+  position: relative;
+  text-decoration: none;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 1.5px;
+  background: var(--color-bid-gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+.link-underline:hover::after {
+  transform: scaleX(1);
+}
+
+/* ---------- Bid burst particles ---------- */
+.burst-particle {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 300;
+  animation: burst-fly 0.7s ease-out forwards;
+}
+@keyframes burst-fly {
+  to {
+    transform: translate(var(--tx), var(--ty)) scale(0);
+    opacity: 0;
+  }
+}
+
 .shine-text {
   background: linear-gradient(95deg, var(--color-bid-gold), #ffe29a 40%, var(--color-bid-gold));
   background-size: 220% 100%;
@@ -107,6 +284,24 @@ body {
   50% {
     opacity: 0.6;
     box-shadow: 0 0 0 7px rgba(77, 238, 234, 0);
+  }
+}
+
+.pulse-dot-live {
+  animation: pulse-dot-live 1.1s ease-in-out infinite;
+}
+
+@keyframes pulse-dot-live {
+
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(255, 59, 78, 0.55);
+  }
+
+  50% {
+    opacity: 0.55;
+    box-shadow: 0 0 0 7px rgba(255, 59, 78, 0);
   }
 }
 
@@ -217,6 +412,14 @@ body {
     animation: none;
   }
 
+  .orb {
+    animation: none;
+  }
+
+  .orb-layer {
+    transition: none;
+  }
+
   .stack-inner {
     animation: none;
   }
@@ -227,6 +430,10 @@ body {
   }
 
   .pulse-dot {
+    animation: none;
+  }
+
+  .pulse-dot-live {
     animation: none;
   }
 }

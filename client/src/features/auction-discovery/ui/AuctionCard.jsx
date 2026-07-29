@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import Badge from "../../../shared/components/Badge.jsx";
+import { useInView } from "../../../shared/hooks/useInView.js";
 import {
   formatCountdown,
   formatCurrency,
@@ -14,6 +15,7 @@ const swatches = [
 ];
 
 export default function AuctionCard({ auction, index }) {
+  const [ref, inView] = useInView();
   const [endsInSec, setEndsInSec] = useState(auction.endsInSec ?? 0);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
@@ -35,22 +37,23 @@ export default function AuctionCard({ auction, index }) {
   const swatch = swatches[index % swatches.length];
 
   const statusRing = {
-    live: "ring-2 ring-bid-cyan/60",
+    live: "ring-2 ring-live-red/60",
     upcoming: "ring-1 ring-bid-violet/50",
     completed: "ring-1 ring-white/10",
   }[auction.status];
 
   const statusGlow = {
-    live: "0 0 0 4px rgba(77,238,234,0.12), 0 20px 45px -16px rgba(77,238,234,0.4)",
+    live: "0 0 0 4px rgba(255,59,78,0.14), 0 20px 45px -16px rgba(255,59,78,0.4)",
     upcoming: "0 20px 40px -16px rgba(0,0,0,0.5)",
     completed: "0 16px 32px -16px rgba(0,0,0,0.4)",
   }[auction.status];
 
   return (
     <Link
+      ref={ref}
       to={`/auction/${auction.id}`}
-      className="reveal block"
-      style={{ animationDelay: `${index * 0.06}s`, perspective: "900px" }}
+      className={inView ? "reveal block" : "opacity-0 block"}
+      style={{ animationDelay: `${(index % 6) * 0.06}s`, perspective: "900px" }}
       onPointerMove={handlePointerMove}
       onPointerLeave={() => setTilt({ x: 0, y: 0 })}
     >
