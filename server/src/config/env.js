@@ -1,0 +1,20 @@
+import dotenv from 'dotenv'
+dotenv.config()
+
+// for checking the env exist or not
+function required(name, fallback) {
+    const value = process.env[name] ?? fallback
+    if (!value)
+        throw new Error(`missing env variable ${name}`)
+    return value
+}
+
+export const env = {
+    JWT_ACCESS_SECRET: required("JWT_ACCESS_SECRET", ""),
+    JWT_REFRESH_SECRET: required("JWT_REFRESH_SECRET", ""),
+    MONGODB_URI: required("MONGODB_URI", "mongodb://localhost:27017/bidnaam"),
+    PORT: process.env.PORT || 3001,
+    CLIENT_URL: process.env.CLIENT_URL || "http://localhost:5173"
+}
+
+export const isProduction = env.nodeEnv === 'production' 
