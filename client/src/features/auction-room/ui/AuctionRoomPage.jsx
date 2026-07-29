@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useParams, Link } from "react-router";
 import { useAuctionRoom } from "../../../shared/hooks/useAuctionRoom.js";
 import Button from "../../../shared/components/Button.jsx";
@@ -6,29 +6,54 @@ import Badge from "../../../shared/components/Badge.jsx";
 import { formatCountdown, formatCurrency } from "../../../shared/utils/formatTime.js";
 import ChatPanel from "../../chat/ui/ChatPanel.jsx";
 
+const BURST_COLORS = ["#FFC94D", "#4DEEEA", "#FF6B3D"];
+
+function spawnBidBurst(el) {
+  if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const rect = el.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+
+  for (let i = 0; i < 12; i++) {
+    const span = document.createElement("span");
+    span.className = "burst-particle";
+    const angle = (Math.PI * 2 * i) / 12 + Math.random() * 0.3;
+    const dist = 60 + Math.random() * 40;
+    span.style.left = `${cx}px`;
+    span.style.top = `${cy}px`;
+    span.style.background = BURST_COLORS[i % BURST_COLORS.length];
+    span.style.setProperty("--tx", `${Math.cos(angle) * dist}px`);
+    span.style.setProperty("--ty", `${Math.sin(angle) * dist}px`);
+    document.body.appendChild(span);
+    setTimeout(() => span.remove(), 720);
+  }
+}
+
 export default function AuctionRoomPage() {
   const { id } = useParams();
   const { room, currentBid, currentBidder, bidCount, remaining, heat, timeline, placeBid } = useAuctionRoom();
   const [bidInput, setBidInput] = useState("");
   const [error, setError] = useState("");
+  const bidButtonRef = useRef(null);
 
   const minNextBid = currentBid + 50;
   const urgent = remaining <= 30 && remaining > 0;
   const ended = remaining <= 0;
 
-  function attemptBid(amount) {
+  function attemptBid(amount, sourceEl) {
     const result = placeBid(amount);
     if (!result.ok) {
       setError(result.error);
       setTimeout(() => setError(""), 2000);
     } else {
       setBidInput("");
+      spawnBidBurst(sourceEl);
     }
   }
 
   function handleSubmit(e) {
     e.preventDefault();
-    attemptBid(Number(bidInput));
+    attemptBid(Number(bidInput), bidButtonRef.current);
   }
 
   return (
@@ -76,7 +101,7 @@ export default function AuctionRoomPage() {
                   placeholder={`Min. ${formatCurrency(minNextBid)}`}
                   className="flex-1 bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-bid-gold focus:ring-2 focus:ring-bid-gold/30 transition font-mono"
                 />
-                <Button type="submit" variant="primary">
+                <Button ref={bidButtonRef} type="submit" variant="primary">
                   Place bid
                 </Button>
               </form>
@@ -86,7 +111,7 @@ export default function AuctionRoomPage() {
                   <button
                     key={inc}
                     type="button"
-                    onClick={() => attemptBid(currentBid + inc)}
+                    onClick={(e) => attemptBid(currentBid + inc, e.currentTarget)}
                     className="glass px-3 py-1.5 rounded-lg text-xs font-semibold text-white/70 hover:text-white transition"
                   >
                     +{formatCurrency(inc)}

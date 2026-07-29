@@ -99,7 +99,8 @@ export default function LiveAuctionHero() {
             <div className="stack-card front glass-strong p-6 flex flex-col justify-between shadow-2xl">
               <div className="flex items-start justify-between">
                 <div className="w-11 h-11 rounded-[10px] bg-linear-to-br from-bid-gold to-bid-orange" />
-                <span className="text-[11px] font-extrabold uppercase tracking-wide text-[#14351F] bg-bid-cyan px-2.5 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wide text-white bg-live-red px-2.5 py-1 rounded-full shadow-[0_0_14px_2px_rgba(255,59,78,0.5)]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white pulse-dot-live" />
                   Live
                 </span>
               </div>

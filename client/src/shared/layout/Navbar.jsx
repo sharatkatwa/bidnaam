@@ -23,10 +23,10 @@ export default function Navbar() {
         {isAuthenticated ? (
           <>
             <span className="text-sm">Hi, {user?.name}</span>
-            <Link to="/auction/create" className="text-sm hover:underline">
+            <Link to="/auction/create" className="link-underline text-sm">
               Create Auction
             </Link>
-            <Link to="/profile" className="text-sm hover:underline">
+            <Link to="/profile" className="link-underline text-sm">
               Profile
             </Link>
             <Button variant="primary" onClick={handleLogout}>
@@ -35,7 +35,7 @@ export default function Navbar() {
           </>
         ) : (
           <>
-            <Link to="/login" className="text-sm hover:underline">
+            <Link to="/login" className="link-underline text-sm">
               Login
             </Link>
             <Button variant="primary" onClick={() => navigate("/register")}>
