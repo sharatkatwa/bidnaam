@@ -8,11 +8,13 @@ import AuctionDiscoveryPage from '../features/auction-discovery/ui/AuctionDiscov
 import AuctionDetailsPage from '../features/auction-discovery/ui/AuctionDetailsPage.jsx'
 import AuctionRoomPage from '../features/auction-room/ui/AuctionRoomPage.jsx'
 import SpectatorPage from '../features/spectator/ui/SpectatorPage.jsx'
+import NotFoundPage from '../shared/components/NotFoundPage.jsx'
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <MainLayout />,
+    errorElement: <NotFoundPage />,
     children: [
       { index: true, element: <AuctionDiscoveryPage /> },
       { path: 'login', element: <LoginPage /> },
