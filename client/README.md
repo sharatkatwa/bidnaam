@@ -59,11 +59,12 @@ src/
 - [x] Redux store setup (`app/store.js` + `shared/store/authSlice.js` + `Provider` in `main.jsx`)
 - [x] Tailwind wiring (vite config + index.css)
 - [x] React Query provider setup (`app/queryClient.js` + `QueryClientProvider` in `main.jsx`)
-- [x] Router setup (`app/router.jsx` + `MainLayout` + placeholder pages per feature)
+- [x] Router setup — Data Router (`createBrowserRouter`) with `MainLayout` + placeholder pages + 404 `errorElement`
 - [x] Dev proxy setup (`vite.config.js` → `/api`, `/socket.io` forward to backend)
-- [ ] `api/` axios instance
+- [x] `api/` axios instance (`axiosInstance.js` — baseURL + auto token attach)
+- [x] `auth` feature — Login + Register (service, hooks, ui)
 - [ ] `shared/layout` Navbar/Footer (structure hai, content baaki)
-- [ ] Feature implementation (auth → discovery → auction-room → create → profile → spectator → chat)
+- [ ] Feature implementation baaki: discovery → auction-room → create → profile → spectator → chat
 
 > ⚠️ Proxy target abhi `http://localhost:5000` assume kiya hai (Domain B ka server abhi pending hai). Jab teammate actual port confirm kare, `vite.config.js` mein update karna.
 
@@ -90,9 +91,15 @@ src/
 | `vite.config.js` | `@tailwindcss/vite` plugin + dev `server.proxy` (`/api`, `/socket.io` → `http://localhost:5000`) |
 | `src/index.css` | `@import "tailwindcss";` add kiya — sab utility classes available |
 | `shared/layout/MainLayout.jsx` | Common wrapper — `<Outlet />` ke through child routes render honge |
-| `app/router.jsx` | `createBrowserRouter` — saare routes yahan define hain, feature ki `ui/` pages ko point karte hain |
+| `app/router.jsx` | `createBrowserRouter` (Data Router) — saare routes + `errorElement` (404) yahan define hain, feature ki `ui/` pages ko point karte hain |
+| `shared/components/NotFoundPage.jsx` | 404 fallback — galat URL ya route error pe render hota hai |
+| `api/axiosInstance.js` | Central axios instance — `baseURL: '/api'` + interceptor jo Redux se token nikal ke `Authorization` header mein attach karta hai |
+| `features/auth/service/authService.js` | `loginUser`, `registerUser` — sirf API calls (POST `/auth/login`, `/auth/register`) |
+| `features/auth/hooks/useLogin.js`, `useRegister.js` | React Query `useMutation` — service call karte hain, success pe Redux (`setCredentials`) update karte hain |
+| `features/auth/ui/LoginPage.jsx`, `RegisterPage.jsx` | Real form UI — Tailwind se style, hooks se connect, loading/error state dikhate hain |
 | `features/*/ui/*Page.jsx` | Placeholder entry pages (Login, Register, Profile, AuctionCreate, AuctionDiscovery, AuctionDetails, AuctionRoom, Spectator) — abhi sirf heading, real UI baad mein banega |
 | `main.jsx` | `App.jsx` (Vite demo) hata diya. Root ab: `Provider` (Redux) → `QueryClientProvider` (React Query) → `RouterProvider` (Router) |
+| ~~`src/assets/*`, `public/icons.svg`~~ | Removed — `App.jsx` (jo inhe use karta tha) delete ho chuka tha, ye orphan (unused) reh gaye the |
 
 ## Running
 
