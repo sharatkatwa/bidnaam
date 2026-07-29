@@ -63,7 +63,10 @@ src/
 - [x] Dev proxy setup (`vite.config.js` → `/api`, `/socket.io` forward to backend)
 - [x] `api/` axios instance (`axiosInstance.js` — baseURL + auto token attach)
 - [x] `auth` feature — Login + Register (service, hooks, ui)
-- [ ] `shared/layout` Navbar/Footer (structure hai, content baaki)
+- [x] Auth persistence (localStorage) + `ProtectedRoute` guarding `profile`, `auction/create`, `auction/:id/room` (FR2)
+- [x] Design system v2 — vibrant gradient theme (violet/magenta/orange + gold/cyan accents), glassmorphism, 3D card stack, aurora background
+- [x] Navbar — auth-aware (Login/Register vs Profile/Create/Logout), glass style
+- [ ] Footer (not started)
 - [ ] Feature implementation baaki: discovery → auction-room → create → profile → spectator → chat
 
 > ⚠️ Proxy target abhi `http://localhost:5000` assume kiya hai (Domain B ka server abhi pending hai). Jab teammate actual port confirm kare, `vite.config.js` mein update karna.
@@ -97,9 +100,49 @@ src/
 | `features/auth/service/authService.js` | `loginUser`, `registerUser` — sirf API calls (POST `/auth/login`, `/auth/register`) |
 | `features/auth/hooks/useLogin.js`, `useRegister.js` | React Query `useMutation` — service call karte hain, success pe Redux (`setCredentials`) update karte hain |
 | `features/auth/ui/LoginPage.jsx`, `RegisterPage.jsx` | Real form UI — Tailwind se style, hooks se connect, loading/error state dikhate hain |
+| `shared/store/authSlice.js` (updated) | Ab `localStorage` se persist hota hai — refresh pe login state nahi ukhadta |
+| `shared/layout/ProtectedRoute.jsx` | Route guard — `isAuthenticated` false hone pe `/login` pe redirect karta hai |
+| `app/router.jsx` (updated) | `profile`, `auction/create`, `auction/:id/room` ab `ProtectedRoute` ke andar nested hain (login required) |
+| `src/index.css` (updated) | `@theme` block — custom fonts (Archivo Black, Inter) + colors (`bid-amber`, `bid-indigo`, `bid-lime`) |
+| `shared/components/Button.jsx` | Reusable button — primary/secondary/outline variants |
+| `shared/components/Badge.jsx` | Status tag — live/ending/upcoming/completed |
+| `shared/components/Card.jsx` | Reusable rounded card wrapper |
+| `shared/components/Loader.jsx` | Spinning loader for async states |
+| `shared/layout/Navbar.jsx` | Auth-aware nav — logged out: Login/Register; logged in: user name, Create Auction, Profile, Logout |
+| `shared/layout/MainLayout.jsx` (updated) | Navbar + `AuroraBackground` wired in, sabhi pages ke upar fix rahega |
+| `shared/components/AuroraBackground.jsx` | Fixed gradient + 3 drifting blobs + grain texture — global page background |
+| `shared/components/LiveAuctionHero.jsx` | Reusable hero: headline, 3D card stack (live bid + countdown), stat counters — used by Login and Register |
+| `src/index.css` (v2) | Vite boilerplate hataya, naya vibrant theme + glass/3D-stack/animation CSS classes add kiye |
+| `shared/components/Button.jsx`, `Badge.jsx` (updated) | Naye gradient/glass colors se restyled |
+| `features/auth/ui/LoginPage.jsx`, `RegisterPage.jsx` (rebuilt) | Split layout — `LiveAuctionHero` + glassmorphic form card |
 | `features/*/ui/*Page.jsx` | Placeholder entry pages (Login, Register, Profile, AuctionCreate, AuctionDiscovery, AuctionDetails, AuctionRoom, Spectator) — abhi sirf heading, real UI baad mein banega |
 | `main.jsx` | `App.jsx` (Vite demo) hata diya. Root ab: `Provider` (Redux) → `QueryClientProvider` (React Query) → `RouterProvider` (Router) |
 | ~~`src/assets/*`, `public/icons.svg`~~ | Removed — `App.jsx` (jo inhe use karta tha) delete ho chuka tha, ye orphan (unused) reh gaye the |
+
+## Design System
+
+Vibrant gradient theme with glassmorphism and a real 3D element — went through several iterations (bold editorial → split-flap board → this) before landing here. See `AuroraBackground.jsx` and `LiveAuctionHero.jsx`.
+
+| Token | Value | Use |
+|---|---|---|
+| `font-display` | Archivo Black | Big headlines |
+| `font-body` | Inter | Body text |
+| `font-mono` | Consolas/SF Mono | Bid amounts, timers, stats (tabular nums) |
+| `bg-bid-violet` (`#3B0F70`) | Deep violet | Gradient start |
+| `bg-bid-magenta` (`#9B2BA6`) | Magenta | Gradient mid |
+| `bg-bid-orange` (`#FF6B3D`) | Orange | Gradient end, CTA |
+| `bg-bid-gold` (`#FFC94D`) | Gold | CTA, shine accent, "ending" status |
+| `bg-bid-cyan` (`#4DEEEA`) | Cyan | "Live" status, eyebrow accents |
+
+**Global background:** `AuroraBackground.jsx` (fixed gradient + 3 drifting blurred blobs + film grain) — mounted once in `MainLayout`, shows through on every page.
+
+**Glass surfaces:** `.glass` / `.glass-strong` CSS classes (frosted, semi-transparent) — used by Navbar and cards instead of solid colors.
+
+**3D card stack:** `LiveAuctionHero.jsx` — 3 layered cards with real CSS `perspective`/`rotateZ`/`translateZ`, auto-floats continuously, tilts further on mouse move. Shows a live-updating bid amount and countdown (currently local demo state — will wire to Socket.io later).
+
+Base components: `Button` (primary/secondary/outline), `Badge` (live/ending/upcoming/completed), `Card`, `Loader` — all in `shared/components/`.
+
+All animations respect `prefers-reduced-motion`.
 
 ## Running
 
