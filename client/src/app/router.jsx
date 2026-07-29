@@ -1,0 +1,27 @@
+import { createBrowserRouter } from 'react-router'
+import MainLayout from '../shared/layout/MainLayout.jsx'
+import LoginPage from '../features/auth/ui/LoginPage.jsx'
+import RegisterPage from '../features/auth/ui/RegisterPage.jsx'
+import ProfilePage from '../features/profile/ui/ProfilePage.jsx'
+import AuctionCreatePage from '../features/auction-create/ui/AuctionCreatePage.jsx'
+import AuctionDiscoveryPage from '../features/auction-discovery/ui/AuctionDiscoveryPage.jsx'
+import AuctionDetailsPage from '../features/auction-discovery/ui/AuctionDetailsPage.jsx'
+import AuctionRoomPage from '../features/auction-room/ui/AuctionRoomPage.jsx'
+import SpectatorPage from '../features/spectator/ui/SpectatorPage.jsx'
+
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <MainLayout />,
+    children: [
+      { index: true, element: <AuctionDiscoveryPage /> },
+      { path: 'login', element: <LoginPage /> },
+      { path: 'register', element: <RegisterPage /> },
+      { path: 'profile', element: <ProfilePage /> },
+      { path: 'auction/create', element: <AuctionCreatePage /> },
+      { path: 'auction/:id', element: <AuctionDetailsPage /> },
+      { path: 'auction/:id/room', element: <AuctionRoomPage /> },
+      { path: 'auction/:id/spectate', element: <SpectatorPage /> },
+    ],
+  },
+])
