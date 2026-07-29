@@ -9,6 +9,7 @@ import AuctionDetailsPage from '../features/auction-discovery/ui/AuctionDetailsP
 import AuctionRoomPage from '../features/auction-room/ui/AuctionRoomPage.jsx'
 import SpectatorPage from '../features/spectator/ui/SpectatorPage.jsx'
 import NotFoundPage from '../shared/components/NotFoundPage.jsx'
+import ProtectedRoute from '../shared/layout/ProtectedRoute.jsx'
 
 export const router = createBrowserRouter([
   {
@@ -19,11 +20,16 @@ export const router = createBrowserRouter([
       { index: true, element: <AuctionDiscoveryPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
-      { path: 'profile', element: <ProfilePage /> },
-      { path: 'auction/create', element: <AuctionCreatePage /> },
       { path: 'auction/:id', element: <AuctionDetailsPage /> },
-      { path: 'auction/:id/room', element: <AuctionRoomPage /> },
       { path: 'auction/:id/spectate', element: <SpectatorPage /> },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          { path: 'profile', element: <ProfilePage /> },
+          { path: 'auction/create', element: <AuctionCreatePage /> },
+          { path: 'auction/:id/room', element: <AuctionRoomPage /> },
+        ],
+      },
     ],
   },
 ])
