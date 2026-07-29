@@ -1,5 +1,5 @@
 const variants = {
-  primary: "bg-gradient-to-r from-bid-orange to-bid-gold text-[#2A1200] hover:brightness-110",
+  primary: "bg-linear-to-r from-bid-orange to-bid-gold text-[#2A1200] hover:brightness-110",
   secondary: "glass text-white hover:bg-white/20",
   outline: "border-2 border-white/40 text-white hover:bg-white/10",
 };
