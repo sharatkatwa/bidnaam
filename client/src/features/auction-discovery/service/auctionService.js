@@ -18,6 +18,7 @@ function normalizeAuction(auction) {
     id: auction._id,
     title: auction.title,
     description: auction.description ?? "",
+    image: auction.images?.[0] ?? null,
     seller: sellerName,
     currentBid: auction.currentHighestBid?.amount ?? auction.startPrice ?? 0,
     currentBidder: bidderName ?? sellerName,

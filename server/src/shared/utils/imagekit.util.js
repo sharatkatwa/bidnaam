@@ -50,7 +50,7 @@ export async function uploadToImageKit(fileBuffer, fileName, folder = "/auctions
       (error, result) => {
         if (error) {
           return reject(
-            new ValidationError(`ImageKit Upload Failed: ${error.message}`)
+            new ValidationError(`ImageKit Upload Failed: ${error.message || error.help || "Unknown error"}`)
           );
         }
         resolve({
