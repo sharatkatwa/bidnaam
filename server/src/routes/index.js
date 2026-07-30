@@ -1,5 +1,6 @@
 import { Router } from "express";
 import authRoutes from "../modules/auth/routes/auth.routes.js";
+import auctionRoutes from "../modules/auction/routes/auction.routes.js";
 
 const router = Router();
 
@@ -8,5 +9,6 @@ router.get("/health", (req, res) => {
 });
 
 router.use("/auth", authRoutes);
+router.use("/auctions", auctionRoutes);
 
 export default router;
