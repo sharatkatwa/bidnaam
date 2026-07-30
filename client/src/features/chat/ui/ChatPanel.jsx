@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useChat } from "../hooks/useChat.js";
 
-export default function ChatPanel() {
+export default function ChatPanel({ auctionId }) {
   const {
     messages,
     pinnedMessage,
@@ -11,7 +11,7 @@ export default function ChatPanel() {
     deleteMessage,
     togglePin,
     toggleMuteUser,
-  } = useChat();
+  } = useChat(auctionId);
   const { isAuthenticated } = useSelector((state) => state.auth);
   const [text, setText] = useState("");
 

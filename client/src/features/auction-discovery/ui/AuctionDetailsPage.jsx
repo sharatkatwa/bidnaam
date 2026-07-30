@@ -16,7 +16,7 @@ export default function AuctionDetailsPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state) => state.auth);
   const { room, currentBid, currentBidder, bidCount, remaining, timeline } =
-    useAuctionRoom();
+    useAuctionRoom(id);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
   const urgent = remaining <= 30 && remaining > 0;

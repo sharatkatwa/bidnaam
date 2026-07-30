@@ -7,6 +7,6 @@ export function useCreateAuction() {
 
   return useMutation({
     mutationFn: createAuction,
-    onSuccess: () => navigate("/"),
+    onSuccess: (auction) => navigate(`/auction/${auction._id}`),
   });
 }

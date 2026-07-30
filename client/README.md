@@ -12,7 +12,7 @@ Real-time auction platform ka frontend. Ye README **Domain A** (Marketplace & UX
 | Server State | TanStack React Query |
 | Routing | React Router v8 |
 | HTTP | Axios |
-| Real-Time | Socket.io-client (Domain B ke sath integration, abhi wire nahi hua) |
+| Real-Time | Socket.io-client (wired — see "Backend Integration Status") |
 
 ## Architecture: Feature-Based + 4-Layer
 
@@ -136,11 +136,18 @@ All animations respect `prefers-reduced-motion`.
 
 ## Backend Integration Status
 
-- [x] **Auth (login/register) wired to Domain B's real API** (2026-07-30) — `axiosInstance` baseURL is now `/api/v1` (was `/api`, Domain B mounts routes under `/api/v1`), `vite.config.js` proxy target updated to `http://localhost:3001` (Domain B's coded default port — confirm with Sharat if his local `.env` overrides `PORT`). `authService.js` unwraps the real response envelope (`{ success, message, data: { user, accessToken, refreshToken } }`) instead of the old assumed flat `{ user, token }` shape.
-  - Backend's `User` model has **no `name` field** — register only persists `email`/`password`. The Register form still collects a name for a nicer UX, but it's kept **client-side only** (`useRegister` reads it from the mutation's `variables`, not the server response) and never sent to the API. For login (and any future session where we only have `email`), display name falls back to the email's local-part (`email.split("@")[0]`).
-  - Login/Register error messages now show the real backend message (e.g. "Invalid email or password") via `err.response?.data?.message`, falling back to a generic string only if that's missing.
-  - **Not wired / gaps found while integrating:** `/auth/forgot-password` has no matching backend route yet (`useForgotPassword` will fail against a real server — same as before, just now a real 404 instead of a fake one); `/auth/me` and `/auth/refresh` exist on the backend but aren't called from the client yet (would matter for persisting a session across reloads via cookie instead of just localStorage — not done, out of scope for this pass).
-  - **Not tested end-to-end** — this environment has no local MongoDB and the server's `node_modules`/`.env` aren't present, so this was verified by careful reading of the actual controller/model/middleware code, not a live request. Please smoke-test login/register yourself once both servers are running.
+- [x] **Auth (login/register)** — fully wired and verified end-to-end (curl + real browser session) against the real API. `axiosInstance` baseURL `/api/v1`, response envelope `{ success, message, data: { user, accessToken, refreshToken } }` unwrapped in `authService.js`. Backend's `User` model has no `name` field — Register's name input stays client-side only, display name falls back to the email's local-part elsewhere. Real backend error messages surface in the UI. `useLogin`/`useRegister` now `navigate("/")` on success (previously missing — user got stuck on the auth page after a successful login).
+  - `/auth/forgot-password` still has no backend route.
+- [x] **Auction discovery + details (REST)** — `getAuctions()`/`getAuctionById()` in `auction-discovery/service/auctionService.js` normalize Domain B's real `Auction` schema (`currentHighestBid.amount`, `endTime`/`startTime` as dates, `status: active|upcoming|completed|cancelled`, populated `seller.email`) into the shape the UI already expects. Verified against the live backend (both empty-DB and with a real created auction).
+- [x] **Auction create (REST, multipart)** — `AuctionCreatePage` now uploads real image files (`multipart/form-data`) and sends `startPrice`/`startTime`/`endTime` computed from the Start-now/Schedule toggle + duration. Reserve price was removed from this form — the real `Auction` schema has no field for it. Verified: creating an auction end-to-end (without an image, see gap below) lands you on its real details page.
+- [x] **Real-time bidding + chat (Socket.io)** — `client/src/api/socket.js` is a shared singleton socket (JWT sent via `auth`), `shared/hooks/useAuctionRoom.js` now fetches real details via REST then joins the auction's Socket.io room and listens for `room_state`/`bid_updated`/`timer_tick`/`auction_ended`/`user_joined`; `placeBid()` emits `submit_bid` instead of mutating local state when a real auction is loaded. `chat/hooks/useChat.js` similarly emits `send_chat` / listens for `chat_message` over the same shared socket. **Chat verified working end-to-end live** (sent a message, watched it round-trip back through the server). Falls back to the old local-mock behavior whenever there's no real auction (e.g. stale demo links).
+
+### Backend gaps found while integrating (not fixed here — out of scope per "don't touch backend" instruction, except where explicitly asked)
+
+- **Image upload is broken**: `POST /auctions` with a file attached fails with `"ImageKit Upload Failed: undefined"` — looks like an ImageKit account/credentials issue, not a client bug (confirmed: the exact same request without a file succeeds with `201`). Needs Sharat to check the ImageKit dashboard/keys.
+- **Real-time bidding cannot currently work end-to-end**: `join_room` always fails with `"Auction room not found."`, for every auction tried — both ones created as immediately-`active` and ones created as `upcoming` and left for 35s+ (past the scheduler's 30s poll interval). Traced to `AuctionEngine.joinAuction()` (`server/src/auction-engine/engine/auction.engine.js`), which only looks up an existing room via `roomManager.getRoom(auctionId)` and throws if none exists — nothing in the create-auction flow or the scheduler's `checkScheduledAuctions()` appears to actually create a room in the engine's `roomManager`. Verified this is a backend issue, not a client wiring issue, using a raw `socket.io-client` script talking directly to the API (bypassing the UI entirely) — same failure. The client-side event contract (`join_room` → `room_state`, `submit_bid` → `bid_updated`, correct payload shapes) is implemented and ready; it just has nothing to talk to yet.
+- Two missing `npm` dependencies were found and fixed while testing locally (`nodemon`, `razorpay` — both used in code/scripts but absent from `server/package.json`).
+- **Payment (Razorpay) module** exists on the backend (`/api/v1/payments/*`) but has no client UI at all yet — explicitly out of scope for this pass, flagged as a separate follow-up.
 
 ## Stretch Goals (2026-07-30, all four done)
 
@@ -153,7 +160,9 @@ All animations respect `prefers-reduced-motion`.
 
 All core SRS FRs and all four stretch goals are done. What's left is only:
 
-- [ ] Wire remaining endpoints (auctions, bids, profile, dashboard, watchlist) to Domain B's real API once those routes exist — only auth (login/register) is wired so far, see "Backend Integration Status" above
+- [ ] Wire profile/dashboard/watchlist to real endpoints once those exist server-side (still mock-data-backed) — auth, discovery, details, create, and real-time bidding/chat are now wired, see "Backend Integration Status" above
+- [ ] Real-time bidding can't be smoke-tested until Domain B fixes the `AuctionEngine` room-creation gap noted above
+- [ ] Build a Razorpay payment UI once the bidding flow actually works (backend routes already exist)
 - [ ] **Before submission:** move `/dashboard` back under `ProtectedRoute` in `app/router.jsx` — currently public for easier local UI review without a working backend login
 
 ## Running
