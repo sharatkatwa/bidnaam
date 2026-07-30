@@ -27,7 +27,7 @@ src/
       hooks/      → business logic — state, validation, mutations/queries
       ui/         → presentational components
   shared/
-    components/   → reusable UI (Button, Badge, Card, Loader, AuroraBackground, CustomCursor, ScrollToTop...)
+    components/   → reusable UI (Button, Badge, Card, Loader, AppBackground, SplitFlapText, ScrollToTop...)
     data/         → cross-feature mock data (e.g. mockRoom.js)
     hooks/        → cross-feature hooks (useAuctionRoom, useInView)
     layout/       → Navbar, MainLayout, ProtectedRoute
@@ -67,43 +67,46 @@ src/
 | `/auction/create` | Create Auction | 🔒 Login required |
 | `/auction/:id/room` | Auction Room (bidding) | 🔒 Login required |
 
-Data Router (`createBrowserRouter`) in `app/router.jsx`, nested under `MainLayout`, with a 404 `errorElement` (`NotFoundPage` — renders outside `MainLayout` since router error elements replace the whole tree, so it mounts its own `AuroraBackground`). `ScrollToTop` (in `MainLayout`) resets scroll position on every route change — React Router doesn't do this by default in a SPA.
+Data Router (`createBrowserRouter`) in `app/router.jsx`, nested under `MainLayout`, with a 404 `errorElement` (`NotFoundPage` — renders outside `MainLayout` since router error elements replace the whole tree, so it mounts its own `AppBackground`). `ScrollToTop` (in `MainLayout`) resets scroll position on every route change — React Router doesn't do this by default in a SPA.
 
 ## Design System
 
-Vibrant gradient theme with glassmorphism + real 3D elements + a canvas particle network. Went through several iterations (bold editorial → split-flap board → glass orbs alone → constellation alone → combined) — the current version layers **both** the glass orbs and the constellation network rather than picking one.
+**Rebuilt from scratch (2026-07-30, later session)** — the old vibrant violet/magenta/gold gradient + glassmorphism + constellation theme is gone. New direction: a dark, flat, editorial "boarding pass / departure board" look (near-black surfaces, cream paper cards, one amber accent, one brick-red for urgency), based on a reference image the user provided. Rationale: the gradient theme read as "AI-generated" and the pink/magenta tones didn't feel professional enough for a competition demo.
 
 | Token | Value | Use |
 |---|---|---|
-| `font-display` | Archivo Black | Big headlines |
+| `font-display` | Fraunces (900) | Big headlines — bold editorial serif |
 | `font-body` | Inter | Body text |
-| `font-mono` | Consolas/SF Mono | Bid amounts, timers, stats (tabular nums) |
-| `bg-bid-violet` (`#3B0F70`) | Deep violet | Gradient start, glass tint base |
-| `bg-bid-magenta` (`#9B2BA6`) | Magenta | Gradient mid |
-| `bg-bid-orange` (`#FF6B3D`) | Orange | Gradient end, primary CTA |
-| `bg-bid-gold` (`#FFC94D`) | Gold | CTA, shine accent, "ending" status |
-| `bg-bid-cyan` (`#4DEEEA`) | Cyan | General "online" presence (not "live") |
-| `bg-live-red` (`#FF3B4E`) | Red | "LIVE" status specifically — cyan didn't read as urgent, red matches the universal broadcast convention (YouTube/Twitch/news) |
+| `font-mono` | JetBrains Mono | Bid amounts, timers, stats (tabular nums) |
+| `bg` (`#0B0A08`) | Near-black | Page background |
+| `bg-raised` (`#151310`) | Slightly lighter | Navbar, footer, `.panel` surfaces |
+| `paper` (`#F2ECE0`) | Cream | Boarding-pass style cards (auth, 404) |
+| `ink` / `ink-dim` | Warm off-white / warm gray | Text on dark surfaces |
+| `paper-ink` / `paper-ink-dim` | Near-black / warm gray | Text on paper surfaces |
+| `brand` (`#DD8B42`) | Amber orange | The **one** accent — CTAs, "live" status, headline highlight |
+| `urgent` (`#C1402E`) | Brick red | Reserved for "ending soon" / countdown urgency only |
+| `swatch-rust/olive/slate/clay` | Muted flat tones | Lot-thumbnail placeholder colors (no gradients — flat "luggage tag" blocks) |
 
-**Global background** (`AuroraBackground.jsx`, mounted once in `MainLayout`):
-1. Gradient base (`.aurora-bg`)
-2. Glass-orb spheres (`.orb-layer`) — glossy 3D-looking circles with a highlight/shadow, drift on their own + shift with mouse parallax
-3. Canvas constellation network (`.constellation-canvas`) — glowing particles that drift, connect with a faint line when close, and gently repel away from the cursor
+**Global background** (`AppBackground.jsx`, mounted once in `MainLayout`, replaces the old `AuroraBackground.jsx`):
+1. Flat near-black base + a faint fixed grid (`.app-bg-grid`), masked so it fades out toward the bottom of the first viewport
+2. Three slowly-drifting "boarding pass ticket" outline rectangles (`.bg-ticket-a/b/c`) — borders only, tilted in 3D via `perspective`/`rotateX`/`rotateZ`, echoing the same paper-card motif used in the foreground so the background feels designed rather than decorative filler
+3. A 3D perspective floor grid (`.app-bg-floor`) pinned to the bottom of the viewport, tilted via `rotateX(72deg)`, with a soft amber horizon glow line (`.app-bg-horizon`) at the vanishing point — gives real depth without gradients
 4. Film grain overlay
 
-**Glass surfaces** (`.glass` / `.glass-strong`): tinted **violet** (matching the gradient family) at fairly high opacity — a neutral dark tint was tried first and looked muddy against the vivid background.
+**Surfaces:** `.panel`/`.panel-strong` (flat bordered dark card, replaces `.glass`), `.paper`/`.paper-tape` (cream card with little rotated "tape" rectangles at the top corners, like a physical boarding pass).
+
+**3D tilt** (`shared/hooks/usePointerTilt.js`): a small reusable hook — mouse position over an element drives `rotateX`/`rotateY` via `perspective()`. Used on: the login/register/forgot-password `.paper` cards (with a static second "ticket" card peeking out from behind for physical depth), the hero's LOT/BID/STATUS table panel, and (already existing before this pass) `AuctionCard` and the auction-details hero image. Kept deliberately restrained — no glossy glass-orb 3D, just a card tilting like it's being held.
+
+**Split-flap wordmark** (`SplitFlapText.jsx`): renders text as individual bordered monospace tiles (used for the "BIDARENA" logo in Navbar/Footer/Hero and the 404 page) — a nod to airport departure boards.
 
 **Micro-interactions:**
-- `CustomCursor.jsx` — a soft glow + ring follow the pointer site-wide (skipped on touch devices and `prefers-reduced-motion`)
-- `.btn-shine` (in `Button.jsx`) — a light sweep crosses the button on hover; `.btn-glow-pulse` — a slow breathing shadow, used on the Navbar's Register button to draw the eye
 - `.link-underline` — animated underline sweep on nav text links
-- `useInView` (IntersectionObserver hook) — `AuctionCard` fades in when scrolled into view instead of animating unconditionally on mount (the earlier version finished animating before below-the-fold cards were ever seen)
-- Bid-placed particle burst (`AuctionRoomPage`) — fires from whichever bid button was clicked, using the same visual language as the constellation dots
-- Status badges (`live`/`ending`/`upcoming`/`completed`) each communicate state at a glance: `live` = red + white pulsing dot, `upcoming` = violet/magenta gradient + a radar-style "ping" ring, `completed` = muted + a checkmark, `ending` = orange/gold gradient
-- `AuctionCard` gets a colored glow ring matching its status (live = red glow) so it reads "hot" without needing to read the badge text
-- `LiveAuctionHero` (login/register) has a real layered 3D card stack (perspective/rotateZ/translateZ) with mouse-parallax tilt
-- Navbar logo has a shine-gradient sweep + a small pulsing red dot ("the arena is live"); logged-in state shows a gradient avatar-initial circle instead of plain text
+- `useInView` (IntersectionObserver hook) — `AuctionCard` fades in when scrolled into view instead of animating unconditionally on mount
+- Bid-placed particle burst (`AuctionRoomPage`) — fires from whichever bid button was clicked
+- Status badges (`live`/`ending`/`upcoming`/`completed`): `live` = flat amber, `ending` = flat brick-red (both readable without color-blindness issues since text always says the state too), `upcoming` = outlined + radar "ping" ring, `completed` = muted + checkmark
 - `PasswordInput.jsx` (shared) — eye icon to toggle show/hide, used by Login and Register
+
+Removed in this pass (no longer used, deleted): `AuroraBackground.jsx` (glass orbs + canvas constellation), `CustomCursor.jsx` (glow/ring cursor follower), `.btn-shine`/`.btn-glow-pulse` (button shine sweep + pulsing glow), `.shine-text` (gradient shimmer text), `.stack-*` (glossy 3D card-stack — replaced by the tilt-hook + ticket-peek pattern above).
 
 All animations respect `prefers-reduced-motion`.
 
@@ -111,7 +114,7 @@ All animations respect `prefers-reduced-motion`.
 
 - **Navbar** collapses to a hamburger menu below `md` (too many links to fit one row on mobile) — `shared/layout/Navbar.jsx`
 - **Two-column pages** (auction-room, spectator, details, create, login, register) use `grid-cols-1 lg:grid-cols-[…]` explicitly, with `min-w-0` on the grid children — without `min-w-0`, a CSS Grid item won't shrink below its content's min-content width, which was silently causing horizontal scroll on mobile (a real bug caught via a Playwright mobile-viewport pass, not just visual inspection)
-- **Discovery filter bar** is `sticky` below the navbar so it stays reachable while scrolling a long list. First attempt used `flex` (block-level, stretches to full container width) which left a large empty-looking glass strip next to the buttons; fixed by keeping it full-width but switching to `glass-strong` (higher opacity) with a border/shadow so it reads as a deliberate toolbar rather than a translucent box with cards bleeding through it while stuck
+- **Discovery filter bar** is `sticky` below the navbar so it stays reachable while scrolling a long list, using `.panel-strong` so it reads as a solid toolbar rather than cards bleeding through it while stuck
 
 ## Setup Progress
 
@@ -119,7 +122,7 @@ All animations respect `prefers-reduced-motion`.
 - [x] Redux, Tailwind, React Query, Router, dev proxy (`/api`, `/socket.io` → `http://localhost:5000`, port TBD from Domain B)
 - [x] `api/axiosInstance.js` — baseURL + auto token attach
 - [x] `auth` — Login/Register, localStorage persistence, `ProtectedRoute`
-- [x] Design system + global `AuroraBackground` (orbs + constellation + grain)
+- [x] Design system v2: dark/paper/amber "boarding pass" theme + global `AppBackground` (3D perspective floor grid + drifting ticket outlines + grain)
 - [x] All 7 Domain A features have working UI + hooks + service (mock-data-backed, ready for real API)
 - [x] Micro-interactions: custom cursor, scroll-reveal, bid burst, button/link hover animations
 - [x] Mobile responsive pass (navbar, grid overflow, sticky filter bar) — verified overflow-free across all pages at 375px width

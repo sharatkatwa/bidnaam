@@ -1,14 +1,19 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { useLogin } from "../hooks/useLogin.js";
+import { usePointerTilt } from "../../../shared/hooks/usePointerTilt.js";
 import Button from "../../../shared/components/Button.jsx";
 import PasswordInput from "../../../shared/components/PasswordInput.jsx";
 import LiveAuctionHero from "../../../shared/components/LiveAuctionHero.jsx";
+
+const fieldClass =
+  "w-full bg-transparent border-0 border-b border-line-paper pb-2.5 text-paper-ink placeholder-paper-ink-dim/50 outline-none focus:border-paper-ink transition";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const login = useLogin();
+  const tilt = usePointerTilt();
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -20,22 +25,28 @@ export default function LoginPage() {
       <LiveAuctionHero />
 
       <div className="flex items-center justify-center">
+        <div className="reveal w-full max-w-sm" style={{ animationDelay: "0.15s" }}>
+        <div className="relative" style={{ perspective: "1400px" }}>
+        <div className="paper absolute inset-0 rounded-3xl translate-x-2.5 translate-y-3 -rotate-2 opacity-50" aria-hidden="true" />
         <div
-          className="glass-strong reveal w-full max-w-sm rounded-[22px] p-9"
-          style={{ animationDelay: "0.15s" }}
+          ref={tilt.ref}
+          onPointerMove={tilt.onPointerMove}
+          onPointerLeave={tilt.onPointerLeave}
+          style={tilt.style}
+          className="paper paper-tape relative rounded-3xl p-9 transition-transform duration-200 ease-out"
         >
-          <div className="text-xs font-bold uppercase tracking-wide text-bid-cyan mb-2">
-            Welcome back
+          <div className="text-xs font-bold uppercase tracking-widest text-urgent mb-3">
+            Boarding now
           </div>
-          <h2 className="text-3xl font-extrabold mb-2">Login to bid</h2>
-          <p className="text-white/70 text-sm mb-7 leading-relaxed">
+          <h2 className="font-display font-black text-3xl mb-2">Login to bid</h2>
+          <p className="text-paper-ink-dim text-sm mb-8 leading-relaxed">
             Browsing stays open to everyone — sign in to place a bid, list a
             lot, or join the room chat.
           </p>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             <div>
-              <label className="block text-xs font-bold text-white/70 mb-1.5">
+              <label className="block text-[11px] font-bold uppercase tracking-widest text-paper-ink-dim mb-2">
                 Email
               </label>
               <input
@@ -43,15 +54,15 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@bidarena.com"
-                className="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-bid-gold focus:ring-2 focus:ring-bid-gold/30 transition"
+                className={fieldClass}
                 required
               />
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-bold text-white/70">Password</label>
-                <Link to="/forgot-password" className="text-xs text-bid-gold hover:underline">
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-[11px] font-bold uppercase tracking-widest text-paper-ink-dim">Password</label>
+                <Link to="/forgot-password" className="text-xs text-urgent font-semibold hover:underline">
                   Forgot password?
                 </Link>
               </div>
@@ -59,14 +70,19 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-bid-gold focus:ring-2 focus:ring-bid-gold/30 transition"
+                className={fieldClass}
                 required
               />
             </div>
 
+            <label className="flex items-center gap-2 text-xs text-paper-ink-dim uppercase tracking-wide">
+              <input type="checkbox" className="accent-paper-ink" />
+              Keep me signed in
+            </label>
+
             <Button
               type="submit"
-              variant="primary"
+              variant="dark"
               disabled={login.isPending}
               className="w-full mt-1"
             >
@@ -74,21 +90,29 @@ export default function LoginPage() {
             </Button>
 
             {login.isError && (
-              <p className="text-red-300 text-sm text-center">
+              <p className="text-urgent text-sm text-center">
                 Login failed. Try again.
               </p>
             )}
           </form>
 
-          <p className="text-white/70 text-sm text-center mt-6">
+          <div className="flex items-center gap-3 my-6 text-[11px] text-paper-ink-dim/60 uppercase tracking-widest">
+            <span className="flex-1 h-px bg-line-paper" />
+            Or
+            <span className="flex-1 h-px bg-line-paper" />
+          </div>
+
+          <p className="text-paper-ink-dim text-sm text-center">
             New here?{" "}
             <Link
               to="/register"
-              className="text-bid-gold font-semibold hover:underline"
+              className="text-urgent font-semibold hover:underline"
             >
               Create an account
             </Link>
           </p>
+        </div>
+        </div>
         </div>
       </div>
     </div>

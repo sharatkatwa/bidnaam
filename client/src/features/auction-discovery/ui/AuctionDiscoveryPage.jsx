@@ -13,17 +13,17 @@ export default function AuctionDiscoveryPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-14">
-      <div className="glass reveal mb-2 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest text-bid-cyan">
-        <span className="w-1.5 h-1.5 rounded-full bg-bid-cyan pulse-dot" />
+      <div className="reveal mb-2 inline-flex items-center gap-2 border border-line rounded-full px-3.5 py-1.5 text-xs font-bold uppercase tracking-widest text-ink-dim">
+        <span className="w-1.5 h-1.5 rounded-full bg-brand pulse-dot" />
         {auctions.filter((a) => a.status === "live").length} auctions live right now
       </div>
 
-      <h1 className="reveal font-display text-[clamp(34px,4.5vw,54px)] leading-tight" style={{ animationDelay: "0.06s" }}>
-        Find your next <span className="shine-text">winning bid.</span>
+      <h1 className="reveal font-display font-black text-[clamp(34px,4.5vw,54px)] leading-tight" style={{ animationDelay: "0.06s" }}>
+        Find your next <span className="text-brand">winning bid.</span>
       </h1>
 
       <div
-        className="reveal glass-strong sticky top-18.25 z-40 flex gap-2 mt-8 mb-8 px-3 py-3 rounded-2xl flex-wrap border border-white/15 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.5)]"
+        className="reveal panel-strong sticky top-18.25 z-40 flex gap-2 mt-8 mb-8 px-3 py-3 rounded-2xl flex-wrap"
         style={{ animationDelay: "0.12s" }}
       >
         {filters.map((f) => (
@@ -32,8 +32,8 @@ export default function AuctionDiscoveryPage() {
             onClick={() => setFilter(f)}
             className={`px-4 py-2 rounded-full text-sm font-semibold capitalize transition ${
               filter === f
-                ? "bg-linear-to-r from-bid-orange to-bid-gold text-[#2A1200]"
-                : "glass text-white/70 hover:text-white"
+                ? "bg-brand text-[#1A0F04]"
+                : "text-ink-dim hover:text-ink hover:bg-white/5"
             }`}
           >
             {f}
@@ -52,7 +52,7 @@ export default function AuctionDiscoveryPage() {
       )}
 
       {!isLoading && visible.length === 0 && (
-        <p className="text-white/50 text-center py-16">No auctions in this category yet.</p>
+        <p className="text-ink-dim text-center py-16">No auctions in this category yet.</p>
       )}
     </div>
   );
