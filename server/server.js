@@ -19,7 +19,8 @@ async function startServer() {
     // 4. Initialize Socket.io Server & Emitter
     const { io, emitter } = initSocketServer(httpServer, engine);
 
-    // Attach emitter reference to engine if needed for broadcasts
+    // Attach io and emitter references to Express app & engine
+    app.set("io", io);
     engine.emitter = emitter;
 
     // 5. Re-hydrate active rooms & timers on restart (Scenario S-15)
