@@ -27,7 +27,7 @@ export default function SpectatorPage() {
     <div className="max-w-6xl mx-auto px-6 py-10">
       <Link
         to="/"
-        className="group glass reveal inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm text-white/75 hover:text-white transition"
+        className="group panel reveal inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm text-ink-dim hover:text-ink transition"
       >
         <span className="transition-transform duration-200 group-hover:-translate-x-1">
           ←
@@ -36,13 +36,13 @@ export default function SpectatorPage() {
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-6 mt-4">
-        <div className="glass reveal rounded-2xl p-6 min-w-0">
-          <div className="h-56 rounded-xl bg-linear-to-br from-bid-gold to-bid-orange mb-5" />
+        <div className="panel reveal rounded-2xl p-6 min-w-0">
+          <div className="lot-swatch h-56 rounded-xl bg-swatch-slate mb-5" />
 
           <div className="flex items-start justify-between gap-3 mb-1">
             <div>
-              <h1 className="font-display text-2xl">{room.title}</h1>
-              <p className="text-white/55 text-sm mt-1">
+              <h1 className="font-display font-black text-2xl">{room.title}</h1>
+              <p className="text-ink-dim text-sm mt-1">
                 by {room.seller} · Lot {id}
               </p>
             </div>
@@ -54,13 +54,13 @@ export default function SpectatorPage() {
             </div>
           </div>
 
-          <p className="text-white/70 text-sm mt-3 leading-relaxed">
+          <p className="text-ink-dim text-sm mt-3 leading-relaxed">
             {room.description}
           </p>
 
-          <div className="flex items-end justify-between mt-6 pt-6 border-t border-white/10">
+          <div className="flex items-end justify-between mt-6 pt-6 border-t border-line">
             <div>
-              <div className="text-white/50 text-xs uppercase tracking-wide">
+              <div className="text-ink-dim text-xs uppercase tracking-wide">
                 Current bid · {currentBidder}
               </div>
               <div
@@ -70,24 +70,24 @@ export default function SpectatorPage() {
                 {formatCurrency(currentBid)}
               </div>
               {room.reservePrice && (
-                <div className={`text-xs mt-1 ${reserveMet ? "text-bid-cyan" : "text-white/45"}`}>
+                <div className={`text-xs mt-1 ${reserveMet ? "text-brand" : "text-ink-dim/70"}`}>
                   {reserveMet ? "✓ Reserve met" : "Reserve not met yet"}
                 </div>
               )}
             </div>
             <div className="text-right">
-              <div className="text-white/50 text-xs uppercase tracking-wide">
+              <div className="text-ink-dim text-xs uppercase tracking-wide">
                 Time left
               </div>
               <div
-                className={`font-mono text-3xl font-bold tabular-nums ${urgent ? "text-red-400 animate-pulse" : "text-bid-gold"}`}
+                className={`font-mono text-3xl font-bold tabular-nums ${urgent ? "text-urgent animate-pulse" : "text-brand"}`}
               >
                 {formatCountdown(remaining)}
               </div>
             </div>
           </div>
 
-          <div className="mt-6 glass rounded-xl p-4 text-center text-white/60 text-sm">
+          <div className="mt-6 panel rounded-xl p-4 text-center text-ink-dim text-sm">
             You're watching this room — login and join as a bidder to place
             bids.
           </div>
@@ -95,7 +95,7 @@ export default function SpectatorPage() {
 
         <div className="flex flex-col gap-5 min-w-0">
           <div
-            className="glass reveal rounded-2xl p-5"
+            className="panel reveal rounded-2xl p-5"
             style={{ animationDelay: "0.08s" }}
           >
             <div className="grid grid-cols-2 gap-4 text-center">
@@ -104,13 +104,13 @@ export default function SpectatorPage() {
             </div>
 
             <div className="mt-5">
-              <div className="flex justify-between text-xs text-white/50 mb-1.5">
+              <div className="flex justify-between text-xs text-ink-dim mb-1.5">
                 <span>Auction heat</span>
                 <span>{heat}°</span>
               </div>
-              <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+              <div className="h-2 rounded-full bg-white/8 overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-linear-to-r from-bid-cyan via-bid-gold to-bid-orange transition-all duration-500"
+                  className="h-full rounded-full bg-brand transition-all duration-500"
                   style={{ width: `${heat}%` }}
                 />
               </div>
@@ -118,17 +118,17 @@ export default function SpectatorPage() {
           </div>
 
           <div
-            className="glass reveal rounded-2xl p-5"
+            className="panel reveal rounded-2xl p-5"
             style={{ animationDelay: "0.14s" }}
           >
-            <h3 className="text-sm font-bold text-white/70 uppercase tracking-wide mb-3">
+            <h3 className="text-sm font-bold text-ink-dim uppercase tracking-wide mb-3">
               Timeline
             </h3>
             <ul className="flex flex-col gap-2.5 max-h-72 overflow-y-auto">
               {timeline.map((event) => (
                 <li
                   key={event.id}
-                  className="text-sm text-white/80 border-l-2 border-bid-cyan/40 pl-3"
+                  className="text-sm text-ink/90 border-l-2 border-brand/40 pl-3"
                 >
                   {event.label}
                 </li>
@@ -147,7 +147,7 @@ function Stat({ value, label }) {
   return (
     <div>
       <div className="font-mono text-xl font-bold tabular-nums">{value}</div>
-      <div className="text-[11px] text-white/50 uppercase tracking-wide">
+      <div className="text-[11px] text-ink-dim uppercase tracking-wide">
         {label}
       </div>
     </div>

@@ -12,16 +12,16 @@ export default function ChatPanel() {
   }
 
   return (
-    <div className="glass reveal rounded-2xl p-5 flex flex-col" style={{ animationDelay: "0.2s" }}>
-      <h3 className="text-sm font-bold text-white/70 uppercase tracking-wide mb-3">Room chat</h3>
+    <div className="panel reveal rounded-2xl p-5 flex flex-col" style={{ animationDelay: "0.2s" }}>
+      <h3 className="text-sm font-bold text-ink-dim uppercase tracking-wide mb-3">Room chat</h3>
 
       <ul className="flex flex-col gap-2 max-h-48 overflow-y-auto mb-3">
         {messages.map((msg) => (
           <li key={msg.id} className="text-sm">
-            <span className={msg.user === "You" ? "text-bid-gold font-semibold" : "text-white/60 font-semibold"}>
+            <span className={msg.user === "You" ? "text-brand font-semibold" : "text-ink-dim font-semibold"}>
               {msg.user}:
             </span>{" "}
-            <span className="text-white/85">{msg.text}</span>
+            <span className="text-ink/90">{msg.text}</span>
           </li>
         ))}
       </ul>
@@ -32,11 +32,11 @@ export default function ChatPanel() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Say something..."
-          className="flex-1 bg-white/10 border border-white/30 rounded-lg px-3 py-2 text-sm text-white placeholder-white/40 outline-none focus:border-bid-gold transition"
+          className="flex-1 bg-white/5 border border-line-strong rounded-lg px-3 py-2 text-sm text-ink placeholder-ink-dim/50 outline-none focus:border-brand transition"
         />
         <button
           type="submit"
-          className="glass px-4 py-2 rounded-lg text-sm font-semibold text-white/80 hover:text-white transition"
+          className="panel px-4 py-2 rounded-lg text-sm font-semibold text-ink-dim hover:text-ink transition"
         >
           Send
         </button>

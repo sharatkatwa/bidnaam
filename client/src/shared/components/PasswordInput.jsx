@@ -5,14 +5,14 @@ export default function PasswordInput({ className = "", ...props }) {
 
   return (
     <div className="relative">
-      <input type={visible ? "text" : "password"} className={`${className} pr-11`} {...props} />
+      <input type={visible ? "text" : "password"} className={`${className} pr-7`} {...props} />
 
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
         tabIndex={-1}
         aria-label={visible ? "Hide password" : "Show password"}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition"
+        className="absolute right-0 top-1/2 -translate-y-1/2 text-paper-ink-dim hover:text-paper-ink transition"
       >
         {visible ? (
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
