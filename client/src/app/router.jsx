@@ -26,11 +26,10 @@ export const router = createBrowserRouter([
       { path: 'forgot-password', element: <ForgotPasswordPage /> },
       { path: 'auction/:id', element: <AuctionDetailsPage /> },
       { path: 'auction/:id/spectate', element: <SpectatorPage /> },
-      // TODO: dashboard is temporarily public for UI preview — move back under ProtectedRoute before submission
-      { path: 'dashboard', element: <DashboardPage /> },
       {
         element: <ProtectedRoute />,
         children: [
+          { path: 'dashboard', element: <DashboardPage /> },
           { path: 'profile', element: <ProfilePage /> },
           { path: 'watchlist', element: <WatchlistPage /> },
           { path: 'auction/create', element: <AuctionCreatePage /> },

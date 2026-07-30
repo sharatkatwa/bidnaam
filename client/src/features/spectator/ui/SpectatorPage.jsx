@@ -17,7 +17,7 @@ export default function SpectatorPage() {
     remaining,
     heat,
     timeline,
-  } = useAuctionRoom();
+  } = useAuctionRoom(id);
 
   const urgent = remaining <= 30 && remaining > 0;
   const ended = remaining <= 0;
@@ -136,7 +136,7 @@ export default function SpectatorPage() {
             </ul>
           </div>
 
-          <ChatPanel />
+          <ChatPanel auctionId={id} />
         </div>
       </div>
     </div>
