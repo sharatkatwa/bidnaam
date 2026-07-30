@@ -20,16 +20,24 @@ export default function LoginPage() {
       <LiveAuctionHero />
 
       <div className="flex items-center justify-center">
-        <div className="glass-strong reveal w-full max-w-sm rounded-[22px] p-9" style={{ animationDelay: "0.15s" }}>
-          <div className="text-xs font-bold uppercase tracking-wide text-bid-cyan mb-2">Welcome back</div>
+        <div
+          className="glass-strong reveal w-full max-w-sm rounded-[22px] p-9"
+          style={{ animationDelay: "0.15s" }}
+        >
+          <div className="text-xs font-bold uppercase tracking-wide text-bid-cyan mb-2">
+            Welcome back
+          </div>
           <h2 className="text-3xl font-extrabold mb-2">Login to bid</h2>
           <p className="text-white/70 text-sm mb-7 leading-relaxed">
-            Browsing stays open to everyone — sign in to place a bid, list a lot, or join the room chat.
+            Browsing stays open to everyone — sign in to place a bid, list a
+            lot, or join the room chat.
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label className="block text-xs font-bold text-white/70 mb-1.5">Email</label>
+              <label className="block text-xs font-bold text-white/70 mb-1.5">
+                Email
+              </label>
               <input
                 type="email"
                 value={email}
@@ -41,7 +49,12 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-white/70 mb-1.5">Password</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-bold text-white/70">Password</label>
+                <Link to="/forgot-password" className="text-xs text-bid-gold hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
               <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -51,16 +64,28 @@ export default function LoginPage() {
               />
             </div>
 
-            <Button type="submit" variant="primary" disabled={login.isPending} className="w-full mt-1">
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={login.isPending}
+              className="w-full mt-1"
+            >
               {login.isPending ? "Logging in..." : "Enter the arena →"}
             </Button>
 
-            {login.isError && <p className="text-red-300 text-sm text-center">Login failed. Try again.</p>}
+            {login.isError && (
+              <p className="text-red-300 text-sm text-center">
+                Login failed. Try again.
+              </p>
+            )}
           </form>
 
           <p className="text-white/70 text-sm text-center mt-6">
             New here?{" "}
-            <Link to="/register" className="text-bid-gold font-semibold hover:underline">
+            <Link
+              to="/register"
+              className="text-bid-gold font-semibold hover:underline"
+            >
               Create an account
             </Link>
           </p>

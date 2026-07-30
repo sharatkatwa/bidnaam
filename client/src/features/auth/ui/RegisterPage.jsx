@@ -9,10 +9,17 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [mismatch, setMismatch] = useState(false);
   const register = useRegister();
 
   function handleSubmit(e) {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setMismatch(true);
+      return;
+    }
+    setMismatch(false);
     register.mutate({ name, email, password });
   }
 
@@ -64,10 +71,22 @@ export default function RegisterPage() {
               />
             </div>
 
+            <div>
+              <label className="block text-xs font-bold text-white/70 mb-1.5">Confirm password</label>
+              <PasswordInput
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-bid-gold focus:ring-2 focus:ring-bid-gold/30 transition"
+                required
+              />
+            </div>
+
             <Button type="submit" variant="primary" disabled={register.isPending} className="w-full mt-1">
               {register.isPending ? "Creating account..." : "Enter the arena →"}
             </Button>
 
+            {mismatch && <p className="text-red-300 text-sm text-center">Passwords don't match.</p>}
             {register.isError && <p className="text-red-300 text-sm text-center">Registration failed. Try again.</p>}
           </form>
 
