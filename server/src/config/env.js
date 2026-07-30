@@ -14,7 +14,8 @@ export const env = {
     JWT_REFRESH_SECRET: required("JWT_REFRESH_SECRET", ""),
     MONGODB_URI: required("MONGODB_URI", "mongodb://localhost:27017/bidnaam"),
     PORT: process.env.PORT || 3001,
+    NODE_ENV: process.env.NODE_ENV || "development",
     CLIENT_URL: process.env.CLIENT_URL || "http://localhost:5173"
 }
 
-export const isProduction = env.nodeEnv === 'production' 
+export const isProduction = env.NODE_ENV === 'production' 
