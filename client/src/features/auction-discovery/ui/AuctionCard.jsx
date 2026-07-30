@@ -7,12 +7,7 @@ import {
   formatCurrency,
 } from "../../../shared/utils/formatTime.js";
 
-const swatches = [
-  "from-bid-gold to-bid-orange",
-  "from-bid-cyan to-bid-violet",
-  "from-bid-magenta to-bid-orange",
-  "from-bid-violet to-bid-cyan",
-];
+const swatches = ["bg-swatch-clay", "bg-swatch-slate", "bg-swatch-rust", "bg-swatch-olive"];
 
 export default function AuctionCard({ auction, index }) {
   const [ref, inView] = useInView();
@@ -37,13 +32,13 @@ export default function AuctionCard({ auction, index }) {
   const swatch = swatches[index % swatches.length];
 
   const statusRing = {
-    live: "ring-2 ring-live-red/60",
-    upcoming: "ring-1 ring-bid-violet/50",
-    completed: "ring-1 ring-white/10",
+    live: "ring-2 ring-urgent/50",
+    upcoming: "ring-1 ring-line-strong",
+    completed: "ring-1 ring-line",
   }[auction.status];
 
   const statusGlow = {
-    live: "0 0 0 4px rgba(255,59,78,0.14), 0 20px 45px -16px rgba(255,59,78,0.4)",
+    live: "0 0 0 4px rgba(193,64,46,0.14), 0 20px 45px -16px rgba(193,64,46,0.35)",
     upcoming: "0 20px 40px -16px rgba(0,0,0,0.5)",
     completed: "0 16px 32px -16px rgba(0,0,0,0.4)",
   }[auction.status];
@@ -58,24 +53,24 @@ export default function AuctionCard({ auction, index }) {
       onPointerLeave={() => setTilt({ x: 0, y: 0 })}
     >
       <div
-        className={`glass rounded-2xl p-5 transition-transform duration-150 ease-out will-change-transform ${statusRing}`}
+        className={`panel rounded-2xl p-5 transition-transform duration-150 ease-out will-change-transform ${statusRing}`}
         style={{
           transform: `rotateX(${(-tilt.y * 7).toFixed(2)}deg) rotateY(${(tilt.x * 9).toFixed(2)}deg) translateZ(0)`,
           boxShadow: `${-tilt.x * 14}px ${16 + tilt.y * 10}px 32px -14px rgba(0,0,0,0.55), ${statusGlow}`,
         }}
       >
-        <div className={`h-32 rounded-xl bg-linear-to-br ${swatch} mb-4`} />
+        <div className={`lot-swatch h-32 rounded-xl ${swatch} mb-4`} />
 
         <div className="flex items-start justify-between gap-2 mb-1">
           <h3 className="font-bold text-lg leading-snug">{auction.title}</h3>
           <Badge status={auction.status}>{auction.status}</Badge>
         </div>
 
-        <p className="text-white/55 text-xs mb-4">by {auction.seller}</p>
+        <p className="text-ink-dim text-xs mb-4">by {auction.seller}</p>
 
         <div className="flex items-end justify-between">
           <div>
-            <div className="text-white/50 text-[11px] uppercase tracking-wide">
+            <div className="text-ink-dim text-[11px] uppercase tracking-wide">
               {auction.status === "upcoming" ? "Starting bid" : "Current bid"}
             </div>
             <div className="font-mono text-xl font-bold tabular-nums">
@@ -86,19 +81,19 @@ export default function AuctionCard({ auction, index }) {
           <div className="text-right">
             {auction.status === "live" && (
               <>
-                <div className="text-white/50 text-[11px] uppercase tracking-wide">
+                <div className="text-ink-dim text-[11px] uppercase tracking-wide">
                   Ends in
                 </div>
-                <div className="font-mono text-bid-gold font-semibold tabular-nums">
+                <div className="font-mono text-brand font-semibold tabular-nums">
                   {formatCountdown(endsInSec)}
                 </div>
               </>
             )}
             {auction.status === "upcoming" && (
-              <div className="text-white/50 text-xs">Not started</div>
+              <div className="text-ink-dim text-xs">Not started</div>
             )}
             {auction.status === "completed" && (
-              <div className="text-white/50 text-xs">
+              <div className="text-ink-dim text-xs">
                 {auction.bidCount} bids
               </div>
             )}

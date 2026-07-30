@@ -15,11 +15,11 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-14">
-      <div className="glass reveal inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest text-bid-cyan mb-2">
+      <div className="panel reveal inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest text-ink-dim mb-2">
         Seller dashboard
       </div>
-      <h1 className="reveal font-display text-[clamp(30px,4vw,44px)]" style={{ animationDelay: "0.06s" }}>
-        Your <span className="shine-text">performance.</span>
+      <h1 className="reveal font-display font-black text-[clamp(30px,4vw,44px)]" style={{ animationDelay: "0.06s" }}>
+        Your <span className="text-brand">performance.</span>
       </h1>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
@@ -30,14 +30,14 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid lg:grid-cols-[1fr_1.3fr] gap-5 mt-6">
-        <div className="glass reveal rounded-2xl p-6 min-w-0" style={{ animationDelay: "0.26s" }}>
-          <h3 className="text-sm font-bold text-white/70 uppercase tracking-wide mb-5">Bids this week</h3>
+        <div className="panel reveal rounded-2xl p-6 min-w-0" style={{ animationDelay: "0.26s" }}>
+          <h3 className="text-sm font-bold text-ink-dim uppercase tracking-wide mb-5">Bids this week</h3>
 
           <div className="flex items-end gap-2 h-32">
             {dashboard.weeklyBids.map((count, i) => (
               <div
                 key={i}
-                className="flex-1 rounded-t-lg bg-linear-to-t from-bid-orange to-bid-gold transition-all duration-500"
+                className="flex-1 rounded-t-lg bg-brand transition-all duration-500"
                 style={{ height: `${(count / maxBids) * 100}%` }}
               />
             ))}
@@ -45,25 +45,25 @@ export default function DashboardPage() {
 
           <div className="flex gap-2 mt-2">
             {days.map((d) => (
-              <span key={d} className="flex-1 text-center text-[10px] text-white/50 uppercase">
+              <span key={d} className="flex-1 text-center text-[10px] text-ink-dim uppercase">
                 {d}
               </span>
             ))}
           </div>
         </div>
 
-        <div className="glass reveal rounded-2xl p-6 min-w-0" style={{ animationDelay: "0.3s" }}>
-          <h3 className="text-sm font-bold text-white/70 uppercase tracking-wide mb-4">My listings</h3>
+        <div className="panel reveal rounded-2xl p-6 min-w-0" style={{ animationDelay: "0.3s" }}>
+          <h3 className="text-sm font-bold text-ink-dim uppercase tracking-wide mb-4">My listings</h3>
           <ul className="flex flex-col gap-3 max-h-80 overflow-y-auto">
             {dashboard.auctions.map((auction) => (
-              <li key={auction.id} className="border-b border-white/10 pb-3 last:border-0 last:pb-0">
+              <li key={auction.id} className="border-b border-line pb-3 last:border-0 last:pb-0">
                 <Link
                   to={auction.status === "live" ? `/auction/${auction.id}/room` : `/auction/${auction.id}`}
-                  className="flex items-center justify-between gap-3 hover:text-bid-gold transition"
+                  className="flex items-center justify-between gap-3 hover:text-brand transition"
                 >
                   <div className="min-w-0">
                     <div className="font-semibold truncate">{auction.title}</div>
-                    <div className="text-white/50 text-xs mt-0.5">
+                    <div className="text-ink-dim text-xs mt-0.5">
                       {auction.views} views · {auction.bids} bids
                     </div>
                   </div>
@@ -83,9 +83,9 @@ export default function DashboardPage() {
 
 function StatCard({ label, value, delay }) {
   return (
-    <div className="glass reveal rounded-2xl p-5 text-center" style={{ animationDelay: delay }}>
+    <div className="panel reveal rounded-2xl p-5 text-center" style={{ animationDelay: delay }}>
       <div className="font-mono text-xl font-bold tabular-nums">{value}</div>
-      <div className="text-[11px] text-white/50 uppercase tracking-wide mt-1">{label}</div>
+      <div className="text-[11px] text-ink-dim uppercase tracking-wide mt-1">{label}</div>
     </div>
   );
 }
