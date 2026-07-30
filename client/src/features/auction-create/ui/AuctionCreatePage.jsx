@@ -10,6 +10,7 @@ export default function AuctionCreatePage() {
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [startBid, setStartBid] = useState("");
+  const [reservePrice, setReservePrice] = useState("");
   const [duration, setDuration] = useState(durationPresets[2].seconds);
   const create = useCreateAuction();
 
@@ -20,6 +21,7 @@ export default function AuctionCreatePage() {
       description,
       imageUrl,
       startBid: Number(startBid),
+      reservePrice: reservePrice ? Number(reservePrice) : null,
       durationSec: duration,
     });
   }
@@ -101,6 +103,20 @@ export default function AuctionCreatePage() {
             </div>
           </div>
 
+          <div>
+            <label className="block text-xs font-bold text-white/70 mb-1.5">Reserve price (optional)</label>
+            <input
+              type="number"
+              value={reservePrice}
+              onChange={(e) => setReservePrice(e.target.value)}
+              placeholder="Minimum price to sell — leave blank for none"
+              className="w-full bg-white/10 border border-white/30 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-bid-gold focus:ring-2 focus:ring-bid-gold/30 transition font-mono"
+            />
+            <p className="text-white/40 text-[11px] mt-1.5">
+              If the highest bid doesn't reach this, the auction closes with no sale.
+            </p>
+          </div>
+
           <Button type="submit" variant="primary" disabled={create.isPending} className="mt-2">
             {create.isPending ? "Publishing..." : "Publish auction"}
           </Button>
@@ -133,6 +149,12 @@ export default function AuctionCreatePage() {
               </div>
               <div className="text-right text-white/50 text-xs">Runs {durationLabel}</div>
             </div>
+
+            {reservePrice && (
+              <div className="text-white/40 text-[11px] mt-3 pt-3 border-t border-white/10">
+                Reserve: {formatCurrency(Number(reservePrice))}
+              </div>
+            )}
           </div>
         </div>
       </div>
