@@ -105,6 +105,7 @@ export function registerSocketHandlers(io, socket, engine, emitter) {
         bid: result.bid,
         highestBid: result.highestBid,
         highestBidder: result.highestBidder,
+        highestBidderEmail: socket.user.email,
         timestamp: new Date(),
       });
     } catch (error) {
