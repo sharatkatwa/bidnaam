@@ -1,5 +1,6 @@
 import { SOCKET_EVENTS } from "./socket.events.js";
 import { getAuctionTimeline } from "../modules/timeline/services/timeline.service.js";
+import { findUserById } from "../modules/auth/dao/user.dao.js";
 
 /**
  * Register all Socket.io event listeners for a client socket connection
@@ -40,6 +41,14 @@ export function registerSocketHandlers(io, socket, engine, emitter) {
 
       // Fetch recent timeline events for state synchronization
       const timelineEvents = await getAuctionTimeline(targetAuctionId, 50);
+      const bidCount = timelineEvents.filter((event) => event.type === "BID_PLACED").length;
+
+      // Resolve the highest bidder's email for display (room state only stores the raw id)
+      let highestBidderEmail = null;
+      if (room.highestBidder) {
+        const bidderUser = await findUserById(room.highestBidder);
+        highestBidderEmail = bidderUser?.email ?? null;
+      }
 
       // Build authoritative initial room state payload
       const initialRoomState = {
@@ -47,6 +56,8 @@ export function registerSocketHandlers(io, socket, engine, emitter) {
         status: room.status,
         highestBid: room.highestBid,
         highestBidder: room.highestBidder,
+        highestBidderEmail,
+        bidCount,
         participantsCount: room.participants.size,
         spectatorsCount: room.spectators.size,
         timeRemaining: room.timer ? room.timer.getRemainingTime() : 0,

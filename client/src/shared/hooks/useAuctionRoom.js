@@ -60,8 +60,9 @@ export function useAuctionRoom(auctionId) {
 
     function onRoomState(state) {
       if (typeof state.highestBid === "number") setCurrentBid(state.highestBid);
-      if (state.highestBidder) setCurrentBidder(state.highestBidder);
+      if (state.highestBidderEmail) setCurrentBidder(state.highestBidderEmail.split("@")[0]);
       if (typeof state.timeRemaining === "number") setRemaining(Math.round(state.timeRemaining / 1000));
+      if (typeof state.bidCount === "number") setBidCount(state.bidCount);
       setActiveBidders(state.participantsCount ?? 0);
       setSpectators(state.spectatorsCount ?? 0);
     }
