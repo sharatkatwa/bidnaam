@@ -51,6 +51,7 @@ src/
 | `spectator` | FR8 | ✅ Read-only room view (no bid controls), same live data + chat |
 | `chat` | FR17 | ✅ `ChatPanel` embedded in auction-room + spectator |
 | `dashboard` (SG13) | — | ✅ Seller analytics: revenue/views/listings summary, weekly bids bar chart, per-listing views+bids (distinct from `profile`, which is the bidder-facing summary) |
+| `watchlist` (SG10) | — | ✅ Save/unsave lots (`WatchButton`), `/watchlist` page, "ending soon" alert banner |
 
 > Note: Timer authority, bid validation/ordering, winner logic — ye sab **Domain B (server)** ki responsibility hai (FR10, FR18, FR19). Domain A abhi local demo state se UI dikhata hai; jab Socket.io events aayenge, `shared/hooks/useAuctionRoom.js` unhi events se driven hoga, UI components change nahi honge.
 
@@ -141,15 +142,18 @@ All animations respect `prefers-reduced-motion`.
   - **Not wired / gaps found while integrating:** `/auth/forgot-password` has no matching backend route yet (`useForgotPassword` will fail against a real server — same as before, just now a real 404 instead of a fake one); `/auth/me` and `/auth/refresh` exist on the backend but aren't called from the client yet (would matter for persisting a session across reloads via cookie instead of just localStorage — not done, out of scope for this pass).
   - **Not tested end-to-end** — this environment has no local MongoDB and the server's `node_modules`/`.env` aren't present, so this was verified by careful reading of the actual controller/model/middleware code, not a live request. Please smoke-test login/register yourself once both servers are running.
 
+## Stretch Goals (2026-07-30, all four done)
+
+- [x] **Watchlists & Alerts (SG10)** — `features/watchlist/`. `shared/store/watchlistSlice.js` (Redux, persisted to `localStorage`) holds watched auction ids; `WatchButton.jsx` (shared) is the heart-toggle used on `AuctionCard` and `AuctionDetailsPage`; `/watchlist` (protected route, linked from Navbar) lists watched lots via `useWatchlist` and shows an "Alert" banner when any watched lot is ending within 5 minutes.
+- [x] **Scheduled Auctions (SG9)** — `AuctionCreatePage` now has a Start-now / Schedule-for-later toggle with a `datetime-local` picker (min = now); the live preview reflects the choice. `AuctionCard` shows a real ticking "Starts in" countdown for `upcoming` lots (`formatCountdownLong` in `shared/utils/formatTime.js`, day/hour/minute scale instead of the live-room `m:ss` format).
+- [x] **Chat Moderation (SG7)** — `useChat` (chat feature) gained `togglePin`/`deleteMessage`/`toggleMuteUser`; `ChatPanel` shows per-message pin/mute/delete icons on hover to any authenticated user (demo has no per-auction "owner" role from the backend yet, so tools are shown to any logged-in user rather than gated to a specific seller — labelled "Moderator tools on" so it reads as a feature showcase, not a real permission model). Pinned message shows in a banner above the list; muted users' messages are filtered out client-side.
+- [x] **Auction Replay (SG3)** — `shared/components/BidReplay.jsx` + `shared/data/mockReplay.js`. Shown on `AuctionDetailsPage` when the auction has ended: play/pause + a scrub slider steps through the historical bid list one event at a time.
+
 ## Remaining (Domain A)
 
-All core SRS FRs for Domain A are UI-complete. What's left is stretch goals only:
+All core SRS FRs and all four stretch goals are done. What's left is only:
 
-- [ ] Scheduled Auctions — start-later scheduling, not just duration (SG9)
-- [ ] Watchlists & Alerts (SG10)
-- [ ] Chat Moderation — mute/pin/delete (SG7)
-- [ ] Auction Replay (SG3)
-- [ ] Wire remaining endpoints (auctions, bids, profile, dashboard) to Domain B's real API once those routes exist — only auth is wired so far
+- [ ] Wire remaining endpoints (auctions, bids, profile, dashboard, watchlist) to Domain B's real API once those routes exist — only auth (login/register) is wired so far, see "Backend Integration Status" above
 - [ ] **Before submission:** move `/dashboard` back under `ProtectedRoute` in `app/router.jsx` — currently public for easier local UI review without a working backend login
 
 ## Running

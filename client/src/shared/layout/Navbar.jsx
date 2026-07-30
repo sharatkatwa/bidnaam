@@ -60,6 +60,9 @@ export default function Navbar() {
               <Link to="/auction/create" className="link-underline text-sm">
                 Create Auction
               </Link>
+              <Link to="/watchlist" className="link-underline text-sm">
+                Watchlist
+              </Link>
               <Link to="/profile" className="link-underline text-sm">
                 Profile
               </Link>

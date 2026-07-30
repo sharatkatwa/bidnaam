@@ -15,6 +15,8 @@ export default function AuctionCreatePage() {
   const [startBid, setStartBid] = useState("");
   const [reservePrice, setReservePrice] = useState("");
   const [duration, setDuration] = useState(durationPresets[2].seconds);
+  const [startMode, setStartMode] = useState("now");
+  const [scheduledAt, setScheduledAt] = useState("");
   const create = useCreateAuction();
 
   function handleSubmit(e) {
@@ -26,6 +28,7 @@ export default function AuctionCreatePage() {
       startBid: Number(startBid),
       reservePrice: reservePrice ? Number(reservePrice) : null,
       durationSec: duration,
+      startAt: startMode === "scheduled" && scheduledAt ? new Date(scheduledAt).toISOString() : null,
     });
   }
 
@@ -107,6 +110,40 @@ export default function AuctionCreatePage() {
           </div>
 
           <div>
+            <label className="block text-xs font-bold text-ink-dim mb-1.5">Start</label>
+            <div className="flex gap-2 mb-3">
+              <button
+                type="button"
+                onClick={() => setStartMode("now")}
+                className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
+                  startMode === "now" ? "bg-brand text-[#1A0F04]" : "border border-line-strong text-ink-dim hover:text-ink"
+                }`}
+              >
+                Start now
+              </button>
+              <button
+                type="button"
+                onClick={() => setStartMode("scheduled")}
+                className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
+                  startMode === "scheduled" ? "bg-brand text-[#1A0F04]" : "border border-line-strong text-ink-dim hover:text-ink"
+                }`}
+              >
+                Schedule for later
+              </button>
+            </div>
+            {startMode === "scheduled" && (
+              <input
+                type="datetime-local"
+                value={scheduledAt}
+                onChange={(e) => setScheduledAt(e.target.value)}
+                min={new Date().toISOString().slice(0, 16)}
+                className={fieldClass}
+                required
+              />
+            )}
+          </div>
+
+          <div>
             <label className="block text-xs font-bold text-ink-dim mb-1.5">Reserve price (optional)</label>
             <input
               type="number"
@@ -151,6 +188,12 @@ export default function AuctionCreatePage() {
                 </div>
               </div>
               <div className="text-right text-ink-dim text-xs">Runs {durationLabel}</div>
+            </div>
+
+            <div className="text-ink-dim text-[11px] mt-3 pt-3 border-t border-line">
+              {startMode === "scheduled" && scheduledAt
+                ? `Starts ${new Date(scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}`
+                : "Starts as soon as you publish"}
             </div>
 
             {reservePrice && (

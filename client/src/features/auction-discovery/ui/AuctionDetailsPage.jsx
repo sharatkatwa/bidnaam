@@ -4,6 +4,8 @@ import { useSelector } from "react-redux";
 import { useAuctionRoom } from "../../../shared/hooks/useAuctionRoom.js";
 import Button from "../../../shared/components/Button.jsx";
 import Badge from "../../../shared/components/Badge.jsx";
+import WatchButton from "../../../shared/components/WatchButton.jsx";
+import BidReplay from "../../../shared/components/BidReplay.jsx";
 import {
   formatCountdown,
   formatCurrency,
@@ -68,9 +70,12 @@ export default function AuctionDetailsPage() {
                 by {room.seller} · Lot {id}
               </p>
             </div>
-            <Badge status={ended ? "completed" : "live"}>
-              {ended ? "Ended" : "Live"}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge status={ended ? "completed" : "live"}>
+                {ended ? "Ended" : "Live"}
+              </Badge>
+              <WatchButton auctionId={id} />
+            </div>
           </div>
 
           <p className="text-ink-dim mt-4 leading-relaxed max-w-2xl">
@@ -98,6 +103,8 @@ export default function AuctionDetailsPage() {
               ))}
             </ul>
           </div>
+
+          {ended && <BidReplay />}
         </div>
 
         <div className="reveal min-w-0" style={{ animationDelay: "0.1s" }}>

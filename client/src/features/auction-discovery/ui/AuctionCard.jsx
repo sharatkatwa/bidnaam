@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import Badge from "../../../shared/components/Badge.jsx";
+import WatchButton from "../../../shared/components/WatchButton.jsx";
 import { useInView } from "../../../shared/hooks/useInView.js";
 import {
   formatCountdown,
+  formatCountdownLong,
   formatCurrency,
 } from "../../../shared/utils/formatTime.js";
 
@@ -12,12 +14,21 @@ const swatches = ["bg-swatch-clay", "bg-swatch-slate", "bg-swatch-rust", "bg-swa
 export default function AuctionCard({ auction, index }) {
   const [ref, inView] = useInView();
   const [endsInSec, setEndsInSec] = useState(auction.endsInSec ?? 0);
+  const [startsInSec, setStartsInSec] = useState(auction.startsInSec ?? 0);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     if (auction.status !== "live") return;
     const timer = setInterval(() => {
       setEndsInSec((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [auction.status]);
+
+  useEffect(() => {
+    if (auction.status !== "upcoming") return;
+    const timer = setInterval(() => {
+      setStartsInSec((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
     return () => clearInterval(timer);
   }, [auction.status]);
@@ -59,7 +70,10 @@ export default function AuctionCard({ auction, index }) {
           boxShadow: `${-tilt.x * 14}px ${16 + tilt.y * 10}px 32px -14px rgba(0,0,0,0.55), ${statusGlow}`,
         }}
       >
-        <div className={`lot-swatch h-32 rounded-xl ${swatch} mb-4`} />
+        <div className="relative mb-4">
+          <div className={`lot-swatch h-32 rounded-xl ${swatch}`} />
+          <WatchButton auctionId={auction.id} className="absolute top-2 right-2" />
+        </div>
 
         <div className="flex items-start justify-between gap-2 mb-1">
           <h3 className="font-bold text-lg leading-snug">{auction.title}</h3>
@@ -90,7 +104,14 @@ export default function AuctionCard({ auction, index }) {
               </>
             )}
             {auction.status === "upcoming" && (
-              <div className="text-ink-dim text-xs">Not started</div>
+              <>
+                <div className="text-ink-dim text-[11px] uppercase tracking-wide">
+                  Starts in
+                </div>
+                <div className="font-mono text-ink font-semibold tabular-nums">
+                  {formatCountdownLong(startsInSec)}
+                </div>
+              </>
             )}
             {auction.status === "completed" && (
               <div className="text-ink-dim text-xs">
