@@ -133,6 +133,14 @@ All animations respect `prefers-reduced-motion`.
 - [x] Confirm-password field on Register — client-side match check before calling `register.mutate`
 - [x] Reserve Price (SG8) — optional field on auction-create + live preview, `mockRoom.reservePrice`, "Reserve met/not met yet" indicator in auction-room + spectator, "closed with no sale" message if the auction ends below reserve
 
+## Backend Integration Status
+
+- [x] **Auth (login/register) wired to Domain B's real API** (2026-07-30) — `axiosInstance` baseURL is now `/api/v1` (was `/api`, Domain B mounts routes under `/api/v1`), `vite.config.js` proxy target updated to `http://localhost:3001` (Domain B's coded default port — confirm with Sharat if his local `.env` overrides `PORT`). `authService.js` unwraps the real response envelope (`{ success, message, data: { user, accessToken, refreshToken } }`) instead of the old assumed flat `{ user, token }` shape.
+  - Backend's `User` model has **no `name` field** — register only persists `email`/`password`. The Register form still collects a name for a nicer UX, but it's kept **client-side only** (`useRegister` reads it from the mutation's `variables`, not the server response) and never sent to the API. For login (and any future session where we only have `email`), display name falls back to the email's local-part (`email.split("@")[0]`).
+  - Login/Register error messages now show the real backend message (e.g. "Invalid email or password") via `err.response?.data?.message`, falling back to a generic string only if that's missing.
+  - **Not wired / gaps found while integrating:** `/auth/forgot-password` has no matching backend route yet (`useForgotPassword` will fail against a real server — same as before, just now a real 404 instead of a fake one); `/auth/me` and `/auth/refresh` exist on the backend but aren't called from the client yet (would matter for persisting a session across reloads via cookie instead of just localStorage — not done, out of scope for this pass).
+  - **Not tested end-to-end** — this environment has no local MongoDB and the server's `node_modules`/`.env` aren't present, so this was verified by careful reading of the actual controller/model/middleware code, not a live request. Please smoke-test login/register yourself once both servers are running.
+
 ## Remaining (Domain A)
 
 All core SRS FRs for Domain A are UI-complete. What's left is stretch goals only:
@@ -141,7 +149,7 @@ All core SRS FRs for Domain A are UI-complete. What's left is stretch goals only
 - [ ] Watchlists & Alerts (SG10)
 - [ ] Chat Moderation — mute/pin/delete (SG7)
 - [ ] Auction Replay (SG3)
-- [ ] Wire real endpoints once Domain B's API/Socket.io contract is confirmed (`service/` files already point at the expected routes)
+- [ ] Wire remaining endpoints (auctions, bids, profile, dashboard) to Domain B's real API once those routes exist — only auth is wired so far
 - [ ] **Before submission:** move `/dashboard` back under `ProtectedRoute` in `app/router.jsx` — currently public for easier local UI review without a working backend login
 
 ## Running
