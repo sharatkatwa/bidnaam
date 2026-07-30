@@ -29,6 +29,8 @@ function normalizeAuction(auction) {
     reservePrice: null,
     activeBidders: 0,
     spectators: 0,
+    winnerId: auction.winner?._id ?? auction.winner ?? null,
+    paymentStatus: auction.paymentStatus ?? "none",
   };
 }
 

@@ -6,6 +6,7 @@ import Button from "../../../shared/components/Button.jsx";
 import Badge from "../../../shared/components/Badge.jsx";
 import WatchButton from "../../../shared/components/WatchButton.jsx";
 import BidReplay from "../../../shared/components/BidReplay.jsx";
+import PaymentButton from "../../payment/ui/PaymentButton.jsx";
 import {
   formatCountdown,
   formatCurrency,
@@ -14,13 +15,14 @@ import {
 export default function AuctionDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const { room, currentBid, currentBidder, bidCount, remaining, timeline } =
     useAuctionRoom(id);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
   const urgent = remaining <= 30 && remaining > 0;
   const ended = remaining <= 0;
+  const isWinner = isAuthenticated && room.winnerId && user?._id === room.winnerId;
 
   function handlePointerMove(e) {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -143,18 +145,28 @@ export default function AuctionDetailsPage() {
             </div>
 
             <div className="flex flex-col gap-3 mt-6">
-              <Button
-                variant="primary"
-                onClick={handlePrimaryCta}
-                disabled={ended}
-                className="w-full"
-              >
-                {ended
-                  ? "Auction ended"
-                  : isAuthenticated
-                    ? "Enter the arena →"
-                    : "Login to bid"}
-              </Button>
+              {isWinner ? (
+                room.paymentStatus === "paid" ? (
+                  <p className="text-brand text-sm font-semibold text-center py-2">
+                    ✓ Payment completed
+                  </p>
+                ) : (
+                  <PaymentButton auctionId={id} auctionTitle={room.title} />
+                )
+              ) : (
+                <Button
+                  variant="primary"
+                  onClick={handlePrimaryCta}
+                  disabled={ended}
+                  className="w-full"
+                >
+                  {ended
+                    ? "Auction ended"
+                    : isAuthenticated
+                      ? "Enter the arena →"
+                      : "Login to bid"}
+                </Button>
+              )}
 
               <Link to={`/auction/${id}/spectate`}>
                 <Button variant="outline" className="w-full">
@@ -162,6 +174,12 @@ export default function AuctionDetailsPage() {
                 </Button>
               </Link>
             </div>
+
+            {isWinner && room.paymentStatus !== "paid" && (
+              <p className="text-brand text-xs text-center mt-4 uppercase tracking-wide">
+                🎉 You won this auction — complete payment to finalize
+              </p>
+            )}
 
             {!isAuthenticated && (
               <p className="text-ink-dim text-xs text-center mt-4">
