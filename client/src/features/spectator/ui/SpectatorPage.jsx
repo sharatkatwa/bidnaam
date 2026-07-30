@@ -37,7 +37,11 @@ export default function SpectatorPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-6 mt-4">
         <div className="panel reveal rounded-2xl p-6 min-w-0">
-          <div className="lot-swatch h-56 rounded-xl bg-swatch-slate mb-5" />
+          {room.image ? (
+            <img src={room.image} alt={room.title} className="h-56 w-full rounded-xl object-cover mb-5" />
+          ) : (
+            <div className="lot-swatch h-56 rounded-xl bg-swatch-slate mb-5" />
+          )}
 
           <div className="flex items-start justify-between gap-3 mb-1">
             <div>

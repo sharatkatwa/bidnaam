@@ -54,13 +54,25 @@ export default function AuctionDetailsPage() {
             onPointerMove={handlePointerMove}
             onPointerLeave={() => setTilt({ x: 0, y: 0 })}
           >
-            <div
-              className="lot-swatch h-80 rounded-2xl bg-swatch-clay transition-transform duration-150 ease-out will-change-transform"
-              style={{
-                transform: `rotateX(${(-tilt.y * 5).toFixed(2)}deg) rotateY(${(tilt.x * 6).toFixed(2)}deg)`,
-                boxShadow: `${-tilt.x * 16}px ${20 + tilt.y * 12}px 40px -16px rgba(0,0,0,0.55)`,
-              }}
-            />
+            {room.image ? (
+              <img
+                src={room.image}
+                alt={room.title}
+                className="h-80 w-full rounded-2xl object-cover transition-transform duration-150 ease-out will-change-transform"
+                style={{
+                  transform: `rotateX(${(-tilt.y * 5).toFixed(2)}deg) rotateY(${(tilt.x * 6).toFixed(2)}deg)`,
+                  boxShadow: `${-tilt.x * 16}px ${20 + tilt.y * 12}px 40px -16px rgba(0,0,0,0.55)`,
+                }}
+              />
+            ) : (
+              <div
+                className="lot-swatch h-80 rounded-2xl bg-swatch-clay transition-transform duration-150 ease-out will-change-transform"
+                style={{
+                  transform: `rotateX(${(-tilt.y * 5).toFixed(2)}deg) rotateY(${(tilt.x * 6).toFixed(2)}deg)`,
+                  boxShadow: `${-tilt.x * 16}px ${20 + tilt.y * 12}px 40px -16px rgba(0,0,0,0.55)`,
+                }}
+              />
+            )}
           </div>
 
           <div className="flex items-start justify-between gap-3 mt-6">

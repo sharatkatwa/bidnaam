@@ -71,7 +71,11 @@ export default function AuctionCard({ auction, index }) {
         }}
       >
         <div className="relative mb-4">
-          <div className={`lot-swatch h-32 rounded-xl ${swatch}`} />
+          {auction.image ? (
+            <img src={auction.image} alt={auction.title} className="h-32 w-full rounded-xl object-cover" />
+          ) : (
+            <div className={`lot-swatch h-32 rounded-xl ${swatch}`} />
+          )}
           <WatchButton auctionId={auction.id} className="absolute top-2 right-2" />
         </div>
 
