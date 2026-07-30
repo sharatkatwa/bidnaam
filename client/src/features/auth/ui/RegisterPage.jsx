@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { useRegister } from "../hooks/useRegister.js";
 import Button from "../../../shared/components/Button.jsx";
+import PasswordInput from "../../../shared/components/PasswordInput.jsx";
 import LiveAuctionHero from "../../../shared/components/LiveAuctionHero.jsx";
 
 export default function RegisterPage() {
@@ -54,8 +55,7 @@ export default function RegisterPage() {
 
             <div>
               <label className="block text-xs font-bold text-white/70 mb-1.5">Password</label>
-              <input
-                type="password"
+              <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"

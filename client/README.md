@@ -50,7 +50,7 @@ src/
 | `auction-room` | FR7, FR9, FR14, FR15, FR16 | ✅ Bidding UI, timer, heat meter, timeline, chat, bid-placed particle burst |
 | `spectator` | FR8 | ✅ Read-only room view (no bid controls), same live data + chat |
 | `chat` | FR17 | ✅ `ChatPanel` embedded in auction-room + spectator |
-| Seller dashboard (SG13) | — | ⏳ Not started — scope not finalized yet (distinct from `profile`) |
+| `dashboard` (SG13) | — | ✅ Seller analytics: revenue/views/listings summary, weekly bids bar chart, per-listing views+bids (distinct from `profile`, which is the bidder-facing summary) |
 
 > Note: Timer authority, bid validation/ordering, winner logic — ye sab **Domain B (server)** ki responsibility hai (FR10, FR18, FR19). Domain A abhi local demo state se UI dikhata hai; jab Socket.io events aayenge, `shared/hooks/useAuctionRoom.js` unhi events se driven hoga, UI components change nahi honge.
 
@@ -63,6 +63,7 @@ src/
 | `/auction/:id` | Auction Details | Public |
 | `/auction/:id/spectate` | Spectator View | Public |
 | `/profile` | Profile | 🔒 Login required |
+| `/dashboard` | Seller Dashboard | ⚠️ Temporarily public (see TODO in `router.jsx`) — move back under `ProtectedRoute` before submission |
 | `/auction/create` | Create Auction | 🔒 Login required |
 | `/auction/:id/room` | Auction Room (bidding) | 🔒 Login required |
 
@@ -101,6 +102,8 @@ Vibrant gradient theme with glassmorphism + real 3D elements + a canvas particle
 - Status badges (`live`/`ending`/`upcoming`/`completed`) each communicate state at a glance: `live` = red + white pulsing dot, `upcoming` = violet/magenta gradient + a radar-style "ping" ring, `completed` = muted + a checkmark, `ending` = orange/gold gradient
 - `AuctionCard` gets a colored glow ring matching its status (live = red glow) so it reads "hot" without needing to read the badge text
 - `LiveAuctionHero` (login/register) has a real layered 3D card stack (perspective/rotateZ/translateZ) with mouse-parallax tilt
+- Navbar logo has a shine-gradient sweep + a small pulsing red dot ("the arena is live"); logged-in state shows a gradient avatar-initial circle instead of plain text
+- `PasswordInput.jsx` (shared) — eye icon to toggle show/hide, used by Login and Register
 
 All animations respect `prefers-reduced-motion`.
 
@@ -108,7 +111,7 @@ All animations respect `prefers-reduced-motion`.
 
 - **Navbar** collapses to a hamburger menu below `md` (too many links to fit one row on mobile) — `shared/layout/Navbar.jsx`
 - **Two-column pages** (auction-room, spectator, details, create, login, register) use `grid-cols-1 lg:grid-cols-[…]` explicitly, with `min-w-0` on the grid children — without `min-w-0`, a CSS Grid item won't shrink below its content's min-content width, which was silently causing horizontal scroll on mobile (a real bug caught via a Playwright mobile-viewport pass, not just visual inspection)
-- **Discovery filter bar** is `sticky` below the navbar so it stays reachable while scrolling a long list, instead of scrolling away
+- **Discovery filter bar** is `sticky` below the navbar so it stays reachable while scrolling a long list. First attempt used `flex` (block-level, stretches to full container width) which left a large empty-looking glass strip next to the buttons; fixed by keeping it full-width but switching to `glass-strong` (higher opacity) with a border/shadow so it reads as a deliberate toolbar rather than a translucent box with cards bleeding through it while stuck
 
 ## Setup Progress
 
@@ -120,9 +123,23 @@ All animations respect `prefers-reduced-motion`.
 - [x] All 7 Domain A features have working UI + hooks + service (mock-data-backed, ready for real API)
 - [x] Micro-interactions: custom cursor, scroll-reveal, bid burst, button/link hover animations
 - [x] Mobile responsive pass (navbar, grid overflow, sticky filter bar) — verified overflow-free across all pages at 375px width
-- [ ] Seller dashboard (scope to be defined — analytics for auctions the user created)
-- [ ] Footer (not started — low priority)
+- [x] Seller dashboard (`/dashboard`) — revenue/views/listings summary, weekly bids bar chart, per-listing analytics (each listing links to its room if live, else its details page)
+- [x] `PasswordInput` show/hide toggle on Login + Register
+
+## Remaining (Domain A)
+
+All core SRS FRs for Domain A are UI-complete. What's left is polish + stretch goals:
+
+- [ ] Footer (not started)
+- [ ] Forgot Password page — link exists on Login, no page behind it yet
+- [ ] Confirm-password field on Register
+- [ ] Reserve Price on auction-create (SG8)
+- [ ] Scheduled Auctions — start-later scheduling, not just duration (SG9)
+- [ ] Watchlists & Alerts (SG10)
+- [ ] Chat Moderation — mute/pin/delete (SG7)
+- [ ] Auction Replay (SG3)
 - [ ] Wire real endpoints once Domain B's API/Socket.io contract is confirmed (`service/` files already point at the expected routes)
+- [ ] **Before submission:** move `/dashboard` back under `ProtectedRoute` in `app/router.jsx` — currently public for easier local UI review without a working backend login
 
 ## Running
 
@@ -133,6 +150,8 @@ npm run dev
 ```
 
 Production build: `npm run build` — has been verified clean; watch out if editing `index.css`'s inline SVG data URIs, since `lightningcss` (the prod minifier) chokes on raw `#`/`%23` fragment references inside them even though the dev server tolerates it. Base64-encode the SVG instead.
+
+**CSS bar-chart gotcha** (hit in `DashboardPage`'s weekly-bids chart): a percentage `height` only resolves against a parent with an explicit height. Putting the bar and its day-label in the same flex column (auto height) made every bar render at 0px — invisible, no error. Fix: bars are direct children of the fixed-height (`h-32`) container; labels live in a separate row underneath.
 
 ## Branching
 
