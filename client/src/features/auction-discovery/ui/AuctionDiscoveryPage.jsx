@@ -23,7 +23,7 @@ export default function AuctionDiscoveryPage() {
       </h1>
 
       <div
-        className="reveal glass sticky top-18.25 z-40 flex gap-2 mt-8 mb-8 px-3 py-3 rounded-2xl flex-wrap"
+        className="reveal glass-strong sticky top-18.25 z-40 flex gap-2 mt-8 mb-8 px-3 py-3 rounded-2xl flex-wrap border border-white/15 shadow-[0_12px_28px_-12px_rgba(0,0,0,0.5)]"
         style={{ animationDelay: "0.12s" }}
       >
         {filters.map((f) => (

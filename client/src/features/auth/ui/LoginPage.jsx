@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { useLogin } from "../hooks/useLogin.js";
 import Button from "../../../shared/components/Button.jsx";
+import PasswordInput from "../../../shared/components/PasswordInput.jsx";
 import LiveAuctionHero from "../../../shared/components/LiveAuctionHero.jsx";
 
 export default function LoginPage() {
@@ -41,8 +42,7 @@ export default function LoginPage() {
 
             <div>
               <label className="block text-xs font-bold text-white/70 mb-1.5">Password</label>
-              <input
-                type="password"
+              <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"

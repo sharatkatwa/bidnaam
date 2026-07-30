@@ -21,11 +21,18 @@ export default function Navbar() {
     navigate(path);
   }
 
+  const initial = user?.name?.[0]?.toUpperCase() ?? "U";
+
   return (
-    <nav className="glass sticky top-0 z-50 text-white">
+    <nav className="glass sticky top-0 z-50 text-white border-b border-white/10 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.6)]">
       <div className="flex items-center justify-between px-6 py-4">
-        <Link to="/" className="font-display text-xl" onClick={() => setMenuOpen(false)}>
-          BIDARENA
+        <Link
+          to="/"
+          className="flex items-center gap-2.5"
+          onClick={() => setMenuOpen(false)}
+        >
+          <span className="w-2 h-2 rounded-full bg-live-red pulse-dot-live" />
+          <span className="font-display text-xl shine-text">BIDARENA</span>
         </Link>
 
         <button
@@ -40,7 +47,15 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-4">
           {isAuthenticated ? (
             <>
-              <span className="text-sm">Hi, {user?.name}</span>
+              <div className="flex items-center gap-2 glass rounded-full pl-1.5 pr-3 py-1.5">
+                <div className="w-6 h-6 rounded-full bg-linear-to-br from-bid-gold to-bid-orange flex items-center justify-center text-[11px] font-bold text-[#2A1200]">
+                  {initial}
+                </div>
+                <span className="text-sm">{user?.name}</span>
+              </div>
+              <Link to="/dashboard" className="link-underline text-sm">
+                Dashboard
+              </Link>
               <Link to="/auction/create" className="link-underline text-sm">
                 Create Auction
               </Link>
@@ -68,7 +83,15 @@ export default function Navbar() {
         <div className="md:hidden flex flex-col gap-3 px-6 pb-5">
           {isAuthenticated ? (
             <>
-              <span className="text-sm text-white/70">Hi, {user?.name}</span>
+              <div className="flex items-center gap-2 glass rounded-full pl-1.5 pr-3 py-1.5 w-fit">
+                <div className="w-6 h-6 rounded-full bg-linear-to-br from-bid-gold to-bid-orange flex items-center justify-center text-[11px] font-bold text-[#2A1200]">
+                  {initial}
+                </div>
+                <span className="text-sm">{user?.name}</span>
+              </div>
+              <Link to="/dashboard" className="text-sm" onClick={() => setMenuOpen(false)}>
+                Dashboard
+              </Link>
               <Link to="/auction/create" className="text-sm" onClick={() => setMenuOpen(false)}>
                 Create Auction
               </Link>
