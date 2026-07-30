@@ -52,6 +52,7 @@ export default function AuctionRoomPage() {
   const minNextBid = currentBid + 50;
   const urgent = remaining <= 30 && remaining > 0;
   const ended = remaining <= 0;
+  const reserveMet = currentBid >= room.reservePrice;
 
   function attemptBid(amount, sourceEl) {
     const result = placeBid(amount);
@@ -112,6 +113,11 @@ export default function AuctionRoomPage() {
               >
                 {formatCurrency(currentBid)}
               </div>
+              {room.reservePrice && (
+                <div className={`text-xs mt-1 ${reserveMet ? "text-bid-cyan" : "text-white/45"}`}>
+                  {reserveMet ? "✓ Reserve met" : "Reserve not met yet"}
+                </div>
+              )}
             </div>
             <div className="text-right">
               <div className="text-white/50 text-xs uppercase tracking-wide">
@@ -157,10 +163,14 @@ export default function AuctionRoomPage() {
 
               {error && <p className="text-red-300 text-sm mt-2">{error}</p>}
             </>
-          ) : (
+          ) : reserveMet ? (
             <div className="mt-6 glass rounded-xl p-4 text-center text-white/70">
               Auction closed. Winner:{" "}
               <b className="text-bid-gold">{currentBidder}</b>
+            </div>
+          ) : (
+            <div className="mt-6 glass rounded-xl p-4 text-center text-white/70">
+              Auction closed. <b className="text-white/90">Reserve price wasn't met</b> — no sale.
             </div>
           )}
         </div>

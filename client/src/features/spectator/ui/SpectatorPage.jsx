@@ -21,6 +21,7 @@ export default function SpectatorPage() {
 
   const urgent = remaining <= 30 && remaining > 0;
   const ended = remaining <= 0;
+  const reserveMet = currentBid >= room.reservePrice;
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
@@ -68,6 +69,11 @@ export default function SpectatorPage() {
               >
                 {formatCurrency(currentBid)}
               </div>
+              {room.reservePrice && (
+                <div className={`text-xs mt-1 ${reserveMet ? "text-bid-cyan" : "text-white/45"}`}>
+                  {reserveMet ? "✓ Reserve met" : "Reserve not met yet"}
+                </div>
+              )}
             </div>
             <div className="text-right">
               <div className="text-white/50 text-xs uppercase tracking-wide">

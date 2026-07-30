@@ -128,12 +128,12 @@ All animations respect `prefers-reduced-motion`.
 - [x] `Footer.jsx` — mounted in `MainLayout` below `<Outlet />`, `main` uses `flex-1` so it sits at the bottom even on short pages
 - [x] Forgot Password page (`/forgot-password`) — linked from Login, `useForgotPassword` hook + `requestPasswordReset` service call, shows a success state after submit
 - [x] Confirm-password field on Register — client-side match check before calling `register.mutate`
+- [x] Reserve Price (SG8) — optional field on auction-create + live preview, `mockRoom.reservePrice`, "Reserve met/not met yet" indicator in auction-room + spectator, "closed with no sale" message if the auction ends below reserve
 
 ## Remaining (Domain A)
 
 All core SRS FRs for Domain A are UI-complete. What's left is stretch goals only:
 
-- [ ] Reserve Price on auction-create (SG8)
 - [ ] Scheduled Auctions — start-later scheduling, not just duration (SG9)
 - [ ] Watchlists & Alerts (SG10)
 - [ ] Chat Moderation — mute/pin/delete (SG7)
