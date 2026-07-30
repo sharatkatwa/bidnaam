@@ -91,7 +91,7 @@ export default function LoginPage() {
 
             {login.isError && (
               <p className="text-urgent text-sm text-center">
-                Login failed. Try again.
+                {login.error?.response?.data?.message || "Login failed. Try again."}
               </p>
             )}
           </form>
