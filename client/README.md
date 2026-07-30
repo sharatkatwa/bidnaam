@@ -59,7 +59,7 @@ src/
 | Path | Page | Protected? |
 |---|---|---|
 | `/` | Auction Discovery (home) | Public |
-| `/login`, `/register` | Auth | Public |
+| `/login`, `/register`, `/forgot-password` | Auth | Public |
 | `/auction/:id` | Auction Details | Public |
 | `/auction/:id/spectate` | Spectator View | Public |
 | `/profile` | Profile | 🔒 Login required |
@@ -125,14 +125,14 @@ All animations respect `prefers-reduced-motion`.
 - [x] Mobile responsive pass (navbar, grid overflow, sticky filter bar) — verified overflow-free across all pages at 375px width
 - [x] Seller dashboard (`/dashboard`) — revenue/views/listings summary, weekly bids bar chart, per-listing analytics (each listing links to its room if live, else its details page)
 - [x] `PasswordInput` show/hide toggle on Login + Register
+- [x] `Footer.jsx` — mounted in `MainLayout` below `<Outlet />`, `main` uses `flex-1` so it sits at the bottom even on short pages
+- [x] Forgot Password page (`/forgot-password`) — linked from Login, `useForgotPassword` hook + `requestPasswordReset` service call, shows a success state after submit
+- [x] Confirm-password field on Register — client-side match check before calling `register.mutate`
 
 ## Remaining (Domain A)
 
-All core SRS FRs for Domain A are UI-complete. What's left is polish + stretch goals:
+All core SRS FRs for Domain A are UI-complete. What's left is stretch goals only:
 
-- [ ] Footer (not started)
-- [ ] Forgot Password page — link exists on Login, no page behind it yet
-- [ ] Confirm-password field on Register
 - [ ] Reserve Price on auction-create (SG8)
 - [ ] Scheduled Auctions — start-later scheduling, not just duration (SG9)
 - [ ] Watchlists & Alerts (SG10)

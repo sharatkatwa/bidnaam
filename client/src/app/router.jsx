@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router'
 import MainLayout from '../shared/layout/MainLayout.jsx'
 import LoginPage from '../features/auth/ui/LoginPage.jsx'
 import RegisterPage from '../features/auth/ui/RegisterPage.jsx'
+import ForgotPasswordPage from '../features/auth/ui/ForgotPasswordPage.jsx'
 import ProfilePage from '../features/profile/ui/ProfilePage.jsx'
 import DashboardPage from '../features/dashboard/ui/DashboardPage.jsx'
 import AuctionCreatePage from '../features/auction-create/ui/AuctionCreatePage.jsx'
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
       { index: true, element: <AuctionDiscoveryPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
+      { path: 'forgot-password', element: <ForgotPasswordPage /> },
       { path: 'auction/:id', element: <AuctionDetailsPage /> },
       { path: 'auction/:id/spectate', element: <SpectatorPage /> },
       // TODO: dashboard is temporarily public for UI preview — move back under ProtectedRoute before submission
