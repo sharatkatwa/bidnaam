@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams, Link } from "react-router";
 import { useAuctionRoom } from "../../../shared/hooks/useAuctionRoom.js";
 import Button from "../../../shared/components/Button.jsx";
@@ -44,9 +44,17 @@ export default function AuctionRoomPage() {
     heat,
     timeline,
     placeBid,
+    bidError,
   } = useAuctionRoom(id);
   const [bidInput, setBidInput] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!bidError) return;
+    setError(bidError);
+    const timer = setTimeout(() => setError(""), 3000);
+    return () => clearTimeout(timer);
+  }, [bidError]);
   const bidButtonRef = useRef(null);
 
   const minNextBid = currentBid + 50;
