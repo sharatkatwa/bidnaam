@@ -1,11 +1,15 @@
 import axiosInstance from "../../../api/axiosInstance.js";
 
-export function loginUser(credentials) {
-  return axiosInstance.post("/auth/login", credentials).then((res) => res.data);
+export function loginUser({ email, password }) {
+  return axiosInstance
+    .post("/auth/login", { email, password })
+    .then((res) => res.data.data);
 }
 
-export function registerUser(userData) {
-  return axiosInstance.post("/auth/register", userData).then((res) => res.data);
+export function registerUser({ email, password }) {
+  return axiosInstance
+    .post("/auth/register", { email, password })
+    .then((res) => res.data.data);
 }
 
 export function requestPasswordReset(email) {

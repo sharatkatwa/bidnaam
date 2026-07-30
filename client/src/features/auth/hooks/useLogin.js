@@ -9,7 +9,8 @@ export function useLogin() {
   return useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
-      dispatch(setCredentials({ user: data.user, token: data.token }));
+      const name = data.user.email.split("@")[0];
+      dispatch(setCredentials({ user: { ...data.user, name }, token: data.accessToken }));
     },
   });
 }

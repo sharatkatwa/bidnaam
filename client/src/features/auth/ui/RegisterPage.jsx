@@ -101,7 +101,11 @@ export default function RegisterPage() {
                 </Button>
 
                 {mismatch && <p className="text-urgent text-sm text-center">Passwords don't match.</p>}
-                {register.isError && <p className="text-urgent text-sm text-center">Registration failed. Try again.</p>}
+                {register.isError && (
+                  <p className="text-urgent text-sm text-center">
+                    {register.error?.response?.data?.message || "Registration failed. Try again."}
+                  </p>
+                )}
               </form>
 
               <div className="flex items-center gap-3 my-6 text-[11px] text-paper-ink-dim/60 uppercase tracking-widest">
