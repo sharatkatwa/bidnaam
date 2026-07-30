@@ -8,8 +8,9 @@ export function useRegister() {
 
   return useMutation({
     mutationFn: registerUser,
-    onSuccess: (data) => {
-      dispatch(setCredentials({ user: data.user, token: data.token }));
+    onSuccess: (data, variables) => {
+      const name = variables.name?.trim() || data.user.email.split("@")[0];
+      dispatch(setCredentials({ user: { ...data.user, name }, token: data.accessToken }));
     },
   });
 }
