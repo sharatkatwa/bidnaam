@@ -22,20 +22,24 @@ export function registerSocketHandlers(io, socket, engine, emitter) {
         return emitter.emitError(socket, "auctionId is required to join a room.");
       }
 
+      const targetAuctionId = auctionId.toString();
+
       // Determine user role and identifier
       const isParticipant = role === "participant" && socket.user;
       const userRole = isParticipant ? "participant" : "spectator";
-      const userId = socket.user ? socket.user._id : `guest_${socket.id}`;
+      const userId = socket.user
+        ? (socket.user._id || socket.user.id).toString()
+        : `guest_${socket.id}`;
 
       // Join Socket.io room channel
-      socket.join(auctionId.toString());
-      socket.currentRoom = auctionId.toString();
+      socket.join(targetAuctionId);
+      socket.currentRoom = targetAuctionId;
 
-      // Register connection in AuctionEngine room
-      const { room } = await engine.joinAuction(auctionId, userId, userRole);
+      // Register connection in AuctionEngine room (auto-hydrates from DB if needed)
+      const { room } = await engine.joinAuction(targetAuctionId, userId, userRole);
 
       // Fetch recent timeline events for state synchronization
-      const timelineEvents = await getAuctionTimeline(auctionId, 50);
+      const timelineEvents = await getAuctionTimeline(targetAuctionId, 50);
 
       // Build authoritative initial room state payload
       const initialRoomState = {
@@ -53,7 +57,7 @@ export function registerSocketHandlers(io, socket, engine, emitter) {
       emitter.emitRoomState(socket, initialRoomState);
 
       // Broadcast user join update to room
-      emitter.emitUserJoined(auctionId, {
+      emitter.emitUserJoined(targetAuctionId, {
         userId,
         role: userRole,
         participantsCount: room.participants.size,
@@ -75,22 +79,29 @@ export function registerSocketHandlers(io, socket, engine, emitter) {
         );
       }
 
-      const { auctionId, amount } = data || {};
+      const auctionId = data?.auctionId || socket.currentRoom;
+      const amount = data?.amount;
 
-      if (!auctionId || amount === undefined) {
-        return emitter.emitError(socket, "auctionId and amount are required.");
+      if (!auctionId || amount === undefined || isNaN(Number(amount))) {
+        return emitter.emitError(
+          socket,
+          "Valid auctionId and bid amount are required."
+        );
       }
 
+      const targetAuctionId = auctionId.toString();
+      const userId = (socket.user._id || socket.user.id).toString();
+
       const bidData = {
-        bidderId: socket.user._id,
+        bidderId: userId,
         amount: Number(amount),
       };
 
       // Execute sequential bid processing in AuctionEngine
-      const result = await engine.submitBid(auctionId, bidData);
+      const result = await engine.submitBid(targetAuctionId, bidData);
 
       // Broadcast valid bid update to all clients in the room
-      emitter.emitBidUpdated(auctionId, {
+      emitter.emitBidUpdated(targetAuctionId, {
         bid: result.bid,
         highestBid: result.highestBid,
         highestBidder: result.highestBidder,
@@ -104,20 +115,23 @@ export function registerSocketHandlers(io, socket, engine, emitter) {
   // 3. SEND CHAT Event (FR-17 Dedicated Live Chat)
   socket.on(SOCKET_EVENTS.SEND_CHAT, (data) => {
     try {
-      const { auctionId, message } = data || {};
+      const auctionId = data?.auctionId || socket.currentRoom;
+      const message = data?.message;
 
       if (!auctionId || !message || !message.trim()) {
         return;
       }
 
       const chatPayload = {
-        senderId: socket.user ? socket.user._id : `guest_${socket.id.slice(0, 4)}`,
+        senderId: socket.user
+          ? (socket.user._id || socket.user.id).toString()
+          : `guest_${socket.id.slice(0, 4)}`,
         senderEmail: socket.user ? socket.user.email : "Spectator",
         message: message.trim(),
         timestamp: new Date(),
       };
 
-      emitter.emitChatMessage(auctionId, chatPayload);
+      emitter.emitChatMessage(auctionId.toString(), chatPayload);
     } catch (error) {
       emitter.emitError(socket, error.message);
     }
@@ -129,12 +143,16 @@ export function registerSocketHandlers(io, socket, engine, emitter) {
       const auctionId = data?.auctionId || socket.currentRoom;
 
       if (auctionId) {
-        const userId = socket.user ? socket.user._id : `guest_${socket.id}`;
-        await engine.leaveAuction(auctionId, userId);
-        socket.leave(auctionId.toString());
+        const targetAuctionId = auctionId.toString();
+        const userId = socket.user
+          ? (socket.user._id || socket.user.id).toString()
+          : `guest_${socket.id}`;
+
+        await engine.leaveAuction(targetAuctionId, userId);
+        socket.leave(targetAuctionId);
         socket.currentRoom = null;
 
-        emitter.emitUserLeft(auctionId, {
+        emitter.emitUserLeft(targetAuctionId, {
           userId,
         });
       }
@@ -147,9 +165,16 @@ export function registerSocketHandlers(io, socket, engine, emitter) {
   socket.on("disconnect", async () => {
     try {
       if (socket.currentRoom) {
-        const userId = socket.user ? socket.user._id : `guest_${socket.id}`;
-        await engine.leaveAuction(socket.currentRoom, userId);
-        emitter.emitUserLeft(socket.currentRoom, { userId });
+        const auctionId = socket.currentRoom;
+        const userId = socket.user
+          ? (socket.user._id || socket.user.id).toString()
+          : `guest_${socket.id}`;
+
+        await engine.leaveAuction(auctionId, userId);
+
+        emitter.emitUserLeft(auctionId, {
+          userId,
+        });
       }
     } catch (error) {
       console.warn(`[Socket Disconnect Warning]: ${error.message}`);
