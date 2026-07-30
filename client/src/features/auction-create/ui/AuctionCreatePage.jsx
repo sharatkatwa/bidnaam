@@ -11,24 +11,32 @@ const fieldClass =
 export default function AuctionCreatePage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [images, setImages] = useState([]);
+  const [imagePreview, setImagePreview] = useState("");
   const [startBid, setStartBid] = useState("");
-  const [reservePrice, setReservePrice] = useState("");
   const [duration, setDuration] = useState(durationPresets[2].seconds);
   const [startMode, setStartMode] = useState("now");
   const [scheduledAt, setScheduledAt] = useState("");
   const create = useCreateAuction();
 
+  function handleImageChange(e) {
+    const files = Array.from(e.target.files ?? []).slice(0, 5);
+    setImages(files);
+    setImagePreview(files[0] ? URL.createObjectURL(files[0]) : "");
+  }
+
   function handleSubmit(e) {
     e.preventDefault();
+    const startTime = startMode === "scheduled" && scheduledAt ? new Date(scheduledAt) : new Date();
+    const endTime = new Date(startTime.getTime() + duration * 1000);
+
     create.mutate({
       title,
       description,
-      imageUrl,
-      startBid: Number(startBid),
-      reservePrice: reservePrice ? Number(reservePrice) : null,
-      durationSec: duration,
-      startAt: startMode === "scheduled" && scheduledAt ? new Date(scheduledAt).toISOString() : null,
+      images,
+      startPrice: Number(startBid),
+      startTime: startTime.toISOString(),
+      endTime: endTime.toISOString(),
     });
   }
 
@@ -70,13 +78,13 @@ export default function AuctionCreatePage() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-ink-dim mb-1.5">Image URL</label>
+            <label className="block text-xs font-bold text-ink-dim mb-1.5">Photos (up to 5)</label>
             <input
-              type="url"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://..."
-              className={fieldClass}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageChange}
+              className={`${fieldClass} file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-brand file:text-[#1A0F04] file:font-semibold file:cursor-pointer cursor-pointer`}
             />
           </div>
 
@@ -143,32 +151,22 @@ export default function AuctionCreatePage() {
             )}
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-ink-dim mb-1.5">Reserve price (optional)</label>
-            <input
-              type="number"
-              value={reservePrice}
-              onChange={(e) => setReservePrice(e.target.value)}
-              placeholder="Minimum price to sell — leave blank for none"
-              className={`${fieldClass} font-mono`}
-            />
-            <p className="text-ink-dim/70 text-[11px] mt-1.5">
-              If the highest bid doesn't reach this, the auction closes with no sale.
-            </p>
-          </div>
-
           <Button type="submit" variant="primary" disabled={create.isPending} className="mt-2">
             {create.isPending ? "Publishing..." : "Publish auction"}
           </Button>
 
-          {create.isError && <p className="text-urgent text-sm">Could not create auction. Try again.</p>}
+          {create.isError && (
+            <p className="text-urgent text-sm">
+              {create.error?.response?.data?.message || "Could not create auction. Try again."}
+            </p>
+          )}
         </form>
 
         <div className="reveal min-w-0" style={{ animationDelay: "0.16s" }}>
           <p className="text-ink-dim text-xs uppercase tracking-wide mb-3">Live preview</p>
           <div className="panel rounded-2xl p-5 sticky top-24">
-            {imageUrl ? (
-              <img src={imageUrl} alt="" className="h-32 w-full object-cover rounded-xl mb-4" />
+            {imagePreview ? (
+              <img src={imagePreview} alt="" className="h-32 w-full object-cover rounded-xl mb-4" />
             ) : (
               <div className="lot-swatch h-32 rounded-xl bg-swatch-clay mb-4" />
             )}
@@ -195,12 +193,6 @@ export default function AuctionCreatePage() {
                 ? `Starts ${new Date(scheduledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}`
                 : "Starts as soon as you publish"}
             </div>
-
-            {reservePrice && (
-              <div className="text-ink-dim/70 text-[11px] mt-3 pt-3 border-t border-line">
-                Reserve: {formatCurrency(Number(reservePrice))}
-              </div>
-            )}
           </div>
         </div>
       </div>

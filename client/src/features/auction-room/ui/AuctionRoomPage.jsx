@@ -44,7 +44,7 @@ export default function AuctionRoomPage() {
     heat,
     timeline,
     placeBid,
-  } = useAuctionRoom();
+  } = useAuctionRoom(id);
   const [bidInput, setBidInput] = useState("");
   const [error, setError] = useState("");
   const bidButtonRef = useRef(null);
@@ -218,7 +218,7 @@ export default function AuctionRoomPage() {
             </ul>
           </div>
 
-          <ChatPanel />
+          <ChatPanel auctionId={id} />
         </div>
       </div>
     </div>
