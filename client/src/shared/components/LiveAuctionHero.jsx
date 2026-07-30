@@ -63,7 +63,7 @@ export default function LiveAuctionHero() {
       </div>
 
       <div
-        className="reveal mt-6 mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-bid-cyan"
+        className="glass reveal mt-6 mb-3 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest text-bid-cyan"
         style={{ animationDelay: "0.08s" }}
       >
         <span className="w-1.5 h-1.5 rounded-full bg-bid-cyan pulse-dot" />

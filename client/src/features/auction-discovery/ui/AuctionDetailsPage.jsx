@@ -39,13 +39,14 @@ export default function AuctionDetailsPage() {
     <div className="max-w-6xl mx-auto px-6 py-10">
       <Link
         to="/"
-        className="text-white/60 text-sm hover:text-white transition"
+        className="group glass reveal inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm text-white/75 hover:text-white transition"
       >
-        ← Back to discovery
+        <span className="transition-transform duration-200 group-hover:-translate-x-1">←</span>
+        Back to discovery
       </Link>
 
-      <div className="grid lg:grid-cols-[1.4fr_1fr] gap-6 mt-4">
-        <div className="reveal">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-6 mt-4">
+        <div className="reveal min-w-0">
           <div
             style={{ perspective: "1100px" }}
             onPointerMove={handlePointerMove}
@@ -99,7 +100,7 @@ export default function AuctionDetailsPage() {
           </div>
         </div>
 
-        <div className="reveal" style={{ animationDelay: "0.1s" }}>
+        <div className="reveal min-w-0" style={{ animationDelay: "0.1s" }}>
           <div className="glass-strong rounded-2xl p-6 sticky top-24">
             <div className="text-white/50 text-xs uppercase tracking-wide">
               Current bid · {currentBidder}

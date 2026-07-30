@@ -16,7 +16,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-73px)] grid lg:grid-cols-[1.4fr_1fr] gap-6 px-6 py-10 lg:px-10">
+    <div className="min-h-[calc(100vh-73px)] grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-6 px-6 py-10 lg:px-10">
       <LiveAuctionHero />
 
       <div className="flex items-center justify-center">

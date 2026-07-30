@@ -13,7 +13,7 @@ export default function AuctionDiscoveryPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-14">
-      <div className="reveal mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-bid-cyan">
+      <div className="glass reveal mb-2 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest text-bid-cyan">
         <span className="w-1.5 h-1.5 rounded-full bg-bid-cyan pulse-dot" />
         {auctions.filter((a) => a.status === "live").length} auctions live right now
       </div>
@@ -22,7 +22,10 @@ export default function AuctionDiscoveryPage() {
         Find your next <span className="shine-text">winning bid.</span>
       </h1>
 
-      <div className="reveal flex gap-2 mt-8 mb-8 flex-wrap" style={{ animationDelay: "0.12s" }}>
+      <div
+        className="reveal glass sticky top-18.25 z-40 flex gap-2 mt-8 mb-8 px-3 py-3 rounded-2xl flex-wrap"
+        style={{ animationDelay: "0.12s" }}
+      >
         {filters.map((f) => (
           <button
             key={f}

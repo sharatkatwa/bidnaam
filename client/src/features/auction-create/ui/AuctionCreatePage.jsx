@@ -35,8 +35,8 @@ export default function AuctionCreatePage() {
         Start a new <span className="shine-text">auction.</span>
       </h1>
 
-      <div className="grid lg:grid-cols-[1.3fr_1fr] gap-6 mt-8">
-        <form onSubmit={handleSubmit} className="glass reveal rounded-2xl p-6 flex flex-col gap-4" style={{ animationDelay: "0.1s" }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-6 mt-8">
+        <form onSubmit={handleSubmit} className="glass reveal rounded-2xl p-6 flex flex-col gap-4 min-w-0" style={{ animationDelay: "0.1s" }}>
           <div>
             <label className="block text-xs font-bold text-white/70 mb-1.5">Title</label>
             <input
@@ -108,7 +108,7 @@ export default function AuctionCreatePage() {
           {create.isError && <p className="text-red-300 text-sm">Could not create auction. Try again.</p>}
         </form>
 
-        <div className="reveal" style={{ animationDelay: "0.16s" }}>
+        <div className="reveal min-w-0" style={{ animationDelay: "0.16s" }}>
           <p className="text-white/50 text-xs uppercase tracking-wide mb-3">Live preview</p>
           <div className="glass rounded-2xl p-5 sticky top-24">
             {imageUrl ? (

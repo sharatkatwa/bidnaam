@@ -3,13 +3,17 @@ import { useParams, Link } from "react-router";
 import { useAuctionRoom } from "../../../shared/hooks/useAuctionRoom.js";
 import Button from "../../../shared/components/Button.jsx";
 import Badge from "../../../shared/components/Badge.jsx";
-import { formatCountdown, formatCurrency } from "../../../shared/utils/formatTime.js";
+import {
+  formatCountdown,
+  formatCurrency,
+} from "../../../shared/utils/formatTime.js";
 import ChatPanel from "../../chat/ui/ChatPanel.jsx";
 
 const BURST_COLORS = ["#FFC94D", "#4DEEEA", "#FF6B3D"];
 
 function spawnBidBurst(el) {
-  if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+    return;
   const rect = el.getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
   const cy = rect.top + rect.height / 2;
@@ -31,7 +35,16 @@ function spawnBidBurst(el) {
 
 export default function AuctionRoomPage() {
   const { id } = useParams();
-  const { room, currentBid, currentBidder, bidCount, remaining, heat, timeline, placeBid } = useAuctionRoom();
+  const {
+    room,
+    currentBid,
+    currentBidder,
+    bidCount,
+    remaining,
+    heat,
+    timeline,
+    placeBid,
+  } = useAuctionRoom();
   const [bidInput, setBidInput] = useState("");
   const [error, setError] = useState("");
   const bidButtonRef = useRef(null);
@@ -58,34 +71,55 @@ export default function AuctionRoomPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
-      <Link to="/" className="text-white/60 text-sm hover:text-white transition">
-        ← Back to discovery
+      <Link
+        to="/"
+        className="group glass reveal inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm text-white/75 hover:text-white transition"
+      >
+        <span className="transition-transform duration-200 group-hover:-translate-x-1">
+          ←
+        </span>
+        Back to discovery
       </Link>
 
-      <div className="grid lg:grid-cols-[1.5fr_1fr] gap-6 mt-4">
-        <div className="glass reveal rounded-2xl p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-6 mt-4">
+        <div className="glass reveal rounded-2xl p-6 min-w-0">
           <div className="h-56 rounded-xl bg-linear-to-br from-bid-gold to-bid-orange mb-5" />
 
           <div className="flex items-start justify-between gap-3 mb-1">
             <div>
               <h1 className="font-display text-2xl">{room.title}</h1>
-              <p className="text-white/55 text-sm mt-1">by {room.seller} · Lot {id}</p>
+              <p className="text-white/55 text-sm mt-1">
+                by {room.seller} · Lot {id}
+              </p>
             </div>
-            <Badge status={ended ? "completed" : "live"}>{ended ? "Ended" : "Live"}</Badge>
+            <Badge status={ended ? "completed" : "live"}>
+              {ended ? "Ended" : "Live"}
+            </Badge>
           </div>
 
-          <p className="text-white/70 text-sm mt-3 leading-relaxed">{room.description}</p>
+          <p className="text-white/70 text-sm mt-3 leading-relaxed">
+            {room.description}
+          </p>
 
           <div className="flex items-end justify-between mt-6 pt-6 border-t border-white/10">
             <div>
-              <div className="text-white/50 text-xs uppercase tracking-wide">Current bid · {currentBidder}</div>
-              <div key={currentBid} className="roll-in font-mono text-4xl font-bold tabular-nums">
+              <div className="text-white/50 text-xs uppercase tracking-wide">
+                Current bid · {currentBidder}
+              </div>
+              <div
+                key={currentBid}
+                className="roll-in font-mono text-4xl font-bold tabular-nums"
+              >
                 {formatCurrency(currentBid)}
               </div>
             </div>
             <div className="text-right">
-              <div className="text-white/50 text-xs uppercase tracking-wide">Time left</div>
-              <div className={`font-mono text-3xl font-bold tabular-nums ${urgent ? "text-red-400 animate-pulse" : "text-bid-gold"}`}>
+              <div className="text-white/50 text-xs uppercase tracking-wide">
+                Time left
+              </div>
+              <div
+                className={`font-mono text-3xl font-bold tabular-nums ${urgent ? "text-red-400 animate-pulse" : "text-bid-gold"}`}
+              >
                 {formatCountdown(remaining)}
               </div>
             </div>
@@ -111,7 +145,9 @@ export default function AuctionRoomPage() {
                   <button
                     key={inc}
                     type="button"
-                    onClick={(e) => attemptBid(currentBid + inc, e.currentTarget)}
+                    onClick={(e) =>
+                      attemptBid(currentBid + inc, e.currentTarget)
+                    }
                     className="glass px-3 py-1.5 rounded-lg text-xs font-semibold text-white/70 hover:text-white transition"
                   >
                     +{formatCurrency(inc)}
@@ -123,13 +159,17 @@ export default function AuctionRoomPage() {
             </>
           ) : (
             <div className="mt-6 glass rounded-xl p-4 text-center text-white/70">
-              Auction closed. Winner: <b className="text-bid-gold">{currentBidder}</b>
+              Auction closed. Winner:{" "}
+              <b className="text-bid-gold">{currentBidder}</b>
             </div>
           )}
         </div>
 
-        <div className="flex flex-col gap-5">
-          <div className="glass reveal rounded-2xl p-5" style={{ animationDelay: "0.08s" }}>
+        <div className="flex flex-col gap-5 min-w-0">
+          <div
+            className="glass reveal rounded-2xl p-5"
+            style={{ animationDelay: "0.08s" }}
+          >
             <div className="grid grid-cols-2 gap-4 text-center">
               <Stat value={bidCount} label="Bids" />
               <Stat value={room.activeBidders} label="Bidders" />
@@ -149,11 +189,19 @@ export default function AuctionRoomPage() {
             </div>
           </div>
 
-          <div className="glass reveal rounded-2xl p-5" style={{ animationDelay: "0.14s" }}>
-            <h3 className="text-sm font-bold text-white/70 uppercase tracking-wide mb-3">Timeline</h3>
+          <div
+            className="glass reveal rounded-2xl p-5"
+            style={{ animationDelay: "0.14s" }}
+          >
+            <h3 className="text-sm font-bold text-white/70 uppercase tracking-wide mb-3">
+              Timeline
+            </h3>
             <ul className="flex flex-col gap-2.5 max-h-72 overflow-y-auto">
               {timeline.map((event) => (
-                <li key={event.id} className="text-sm text-white/80 border-l-2 border-bid-cyan/40 pl-3">
+                <li
+                  key={event.id}
+                  className="text-sm text-white/80 border-l-2 border-bid-cyan/40 pl-3"
+                >
                   {event.label}
                 </li>
               ))}
@@ -171,7 +219,9 @@ function Stat({ value, label }) {
   return (
     <div>
       <div className="font-mono text-xl font-bold tabular-nums">{value}</div>
-      <div className="text-[11px] text-white/50 uppercase tracking-wide">{label}</div>
+      <div className="text-[11px] text-white/50 uppercase tracking-wide">
+        {label}
+      </div>
     </div>
   );
 }
