@@ -1,6 +1,6 @@
 import { NotFoundError, ValidationError } from "../../shared/errors/custom-error.js";
 import { createBid } from "../../modules/bidding/services/bid.service.js";
-import { processHighestBid, closeAuction } from "../../modules/auction/services/auction.service.js";
+import { processHighestBid, closeAuction, getAuction } from "../../modules/auction/services/auction.service.js";
 import { createTimelineEvent } from "../../modules/timeline/services/timeline.service.js";
 import { validateBid } from "../validators/bid.validator.js";
 import { recoverActiveAuctions } from "../recovery/recovery.service.js";
@@ -16,6 +16,7 @@ import RoomManager from "./room.manager.js";
 class AuctionEngine {
     constructor() {
         this.roomManager = new RoomManager();
+        this.emitter = null;
     }
 
     /**
@@ -70,7 +71,8 @@ class AuctionEngine {
      * Step 2: Stop Timer
      * Step 3: Find Winner from room runtime state
      * Step 4: Persist Winner & status in DB via closeAuction service
-     * Step 5: Remove Room from RoomManager
+     * Step 5: Broadcast auction_ended via Socket Emitter if attached
+     * Step 6: Remove Room from RoomManager
      *
      * @param {AuctionRoom} room - Target in-memory room instance
      * @returns {Promise<Object>} Finalized auction state summary
@@ -93,10 +95,21 @@ class AuctionEngine {
         // 4. Update Auction status & persist winner in MongoDB (also logs AUCTION_CLOSED timeline event)
         const updatedAuctionDoc = await closeAuction(auctionId, winnerId);
 
-        // 5. Remove Room from active RoomManager
+        // 5. Broadcast auction completion event via Socket Emitter
+        if (this.emitter) {
+            this.emitter.emitAuctionEnded(auctionId, {
+                auctionId,
+                status: "completed",
+                winner: winnerId,
+                winningBid,
+                auction: updatedAuctionDoc,
+            });
+        }
+
+        // 6. Remove Room from active RoomManager
         this.roomManager.removeRoom(auctionId);
 
-        // 6. Return domain state for Socket notification broadcast / API response
+        // 7. Return domain state summary
         return {
             success: true,
             message: winnerId
@@ -110,17 +123,25 @@ class AuctionEngine {
     }
 
     /**
-     * Join an auction room as a active bidder participant or spectator
+     * Join an auction room as a active bidder participant or spectator.
+     * Auto-hydrates room from database if it hasn't been instantiated yet.
+     *
      * @param {string} auctionId - Target auction ID
      * @param {string} userId - User Mongoose ObjectId
      * @param {string} role - Role type ("participant" | "spectator")
      * @returns {Promise<Object>} Join operation result
      */
     async joinAuction(auctionId, userId, role = "participant") {
-        const room = this.roomManager.getRoom(auctionId);
+        let room = this.roomManager.getRoom(auctionId);
 
+        // Auto-hydrate room from DB if not already initialized
         if (!room) {
-            throw new NotFoundError("Auction room not found.");
+            const auction = await getAuction(auctionId);
+            if (!auction) {
+                throw new NotFoundError("Auction not found.");
+            }
+
+            room = await this.startAuction(auction);
         }
 
         const id = userId.toString();
@@ -147,7 +168,7 @@ class AuctionEngine {
         const room = this.roomManager.getRoom(auctionId);
 
         if (!room) {
-            throw new NotFoundError("Auction room not found.");
+            return { success: true };
         }
 
         const id = userId.toString();
@@ -164,16 +185,23 @@ class AuctionEngine {
      * Enqueue and deterministically process a bid submission (FR-9, FR-11, FR-12)
      * Sequential execution guarantees latency-independent order without race conditions.
      * Includes Anti-Sniping dynamic timer extension (SG-1).
+     * Auto-hydrates room from database if not initialized.
      *
      * @param {string} auctionId - Target auction ID
      * @param {Object} bidData - Bid payload ({ bidderId, amount })
      * @returns {Promise<Object>} Domain result containing { bid, highestBid, highestBidder }
      */
     async submitBid(auctionId, bidData) {
-        const room = this.roomManager.getRoom(auctionId);
+        let room = this.roomManager.getRoom(auctionId);
 
+        // Auto-hydrate room from DB if not initialized
         if (!room) {
-            throw new NotFoundError("Auction room not found.");
+            const auction = await getAuction(auctionId);
+            if (!auction) {
+                throw new NotFoundError("Auction not found.");
+            }
+
+            room = await this.startAuction(auction);
         }
 
         return room.bidQueue.enqueue(async () => {
@@ -217,6 +245,14 @@ class AuctionEngine {
                         type: "TIME_EXTENDED",
                         metadata: { extendedSeconds: 30 },
                     });
+
+                    if (this.emitter) {
+                        this.emitter.emitTimeExtended(auctionId, {
+                            auctionId,
+                            newEndTime: room.timer.endTime,
+                            extendedSeconds: 30,
+                        });
+                    }
                 }
             }
 

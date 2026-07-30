@@ -8,8 +8,9 @@ class AuctionRoom {
         this.status = auction.status;
 
         this.highestBid = auction.currentHighestBid?.amount || auction.startPrice;
-        this.highestBidder =
-            auction.currentHighestBid?.bidder?.toString() || null;
+        
+        const bidderObj = auction.currentHighestBid?.bidder;
+        this.highestBidder = bidderObj ? (bidderObj._id || bidderObj).toString() : null;
 
         this.participants = new Set();
         this.spectators = new Set();
