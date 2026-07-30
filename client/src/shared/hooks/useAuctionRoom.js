@@ -67,11 +67,12 @@ export function useAuctionRoom(auctionId) {
     }
 
     function onBidUpdated(payload) {
+      const bidderName = payload.highestBidderEmail?.split("@")[0] ?? "a bidder";
       setCurrentBid(payload.highestBid);
-      setCurrentBidder(payload.highestBidder ?? "bidder");
+      setCurrentBidder(bidderName);
       setBidCount((prev) => prev + 1);
       setHeat((prev) => Math.min(100, prev + 15));
-      addTimelineEvent(`${payload.highestBidder ?? "Someone"} bid ${formatCurrency(payload.highestBid)}`);
+      addTimelineEvent(`${bidderName} bid ${formatCurrency(payload.highestBid)}`);
     }
 
     function onTimerTick(payload) {
