@@ -27,6 +27,7 @@ export function useAuctionRoom(auctionId) {
   const [heat, setHeat] = useState(40);
   const [activeBidders, setActiveBidders] = useState(room.activeBidders ?? 0);
   const [spectators, setSpectators] = useState(room.spectators ?? 0);
+  const [bidError, setBidError] = useState(null);
   const [timeline, setTimeline] = useState([
     { id: 1, label: `${room.currentBidder} bid ${formatCurrency(room.currentBid)}` },
   ]);
@@ -89,11 +90,16 @@ export function useAuctionRoom(auctionId) {
       setSpectators(payload.spectatorsCount ?? 0);
     }
 
+    function onSocketError(payload) {
+      setBidError(payload?.error || "Bid could not be placed. Try again.");
+    }
+
     socket.on(SOCKET_EVENTS.ROOM_STATE, onRoomState);
     socket.on(SOCKET_EVENTS.BID_UPDATED, onBidUpdated);
     socket.on(SOCKET_EVENTS.TIMER_TICK, onTimerTick);
     socket.on(SOCKET_EVENTS.AUCTION_ENDED, onAuctionEnded);
     socket.on(SOCKET_EVENTS.USER_JOINED, onUserJoined);
+    socket.on(SOCKET_EVENTS.ERROR, onSocketError);
 
     return () => {
       socket.emit(SOCKET_EVENTS.LEAVE_ROOM, { auctionId });
@@ -102,6 +108,7 @@ export function useAuctionRoom(auctionId) {
       socket.off(SOCKET_EVENTS.TIMER_TICK, onTimerTick);
       socket.off(SOCKET_EVENTS.AUCTION_ENDED, onAuctionEnded);
       socket.off(SOCKET_EVENTS.USER_JOINED, onUserJoined);
+      socket.off(SOCKET_EVENTS.ERROR, onSocketError);
     };
   }, [auctionId, real, isAuthenticated, addTimelineEvent]);
 
@@ -118,6 +125,7 @@ export function useAuctionRoom(auctionId) {
     }
 
     if (real) {
+      setBidError(null);
       getSocket().emit(SOCKET_EVENTS.SUBMIT_BID, { auctionId, amount });
       return { ok: true };
     }
@@ -139,5 +147,6 @@ export function useAuctionRoom(auctionId) {
     heat,
     timeline,
     placeBid,
+    bidError,
   };
 }
