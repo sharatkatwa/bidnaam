@@ -6,11 +6,9 @@ import {
   deleteAuction as deleteAuctionDAO,
   updateHighestBid as updateHighestBidDAO,
 } from "../dao/auction.dao.js";
-import Bid from "../../../models/bid.model.js";
 import Timeline from "../../../models/timeline.model.js";
 import {
   NotFoundError,
-  ValidationError,
 } from "../../../shared/errors/custom-error.js";
 
 /**
@@ -73,55 +71,21 @@ export async function deleteAuction(id) {
 }
 
 /**
- * Service to validate, record a new bid document, update highest bid on the auction,
- * and record a timeline event. Designed for consumption by the Real-Time Auction Engine.
- *
+ * Service to persist the highest bid update for an active auction document in the database
  * @param {string} auctionId - Target auction ID
- * @param {number|Object} bid - Bid amount or bid details object ({ amount, bidId })
- * @param {string} bidderId - User ID submitting the bid
- * @returns {Promise<Object>} Object containing updated auction and recorded bid document
+ * @param {Object} bidPayload - ({ amount, bidderId, bidId, timestamp })
+ * @returns {Promise<Object|null>} Updated auction document or null if race condition failed
  */
-export async function updateHighestBid(auctionId, bid, bidderId) {
-  const amount = typeof bid === "number" ? bid : bid.amount;
-  const timestamp = new Date();
-
-  // 1. Create Bid record in database
-  const bidDoc = await Bid.create({
-    auction: auctionId,
-    bidder: bidderId,
-    amount,
-  });
-
-  // 2. Atomically update Auction highest bid in database via DAO
-  const updatedAuction = await updateHighestBidDAO(auctionId, {
+export async function processHighestBid(
+  auctionId,
+  { amount, bidderId, bidId, timestamp = new Date() }
+) {
+  return await updateHighestBidDAO(auctionId, {
     amount,
     bidderId,
-    bidId: bidDoc._id,
+    bidId,
     timestamp,
   });
-
-  if (!updatedAuction) {
-    throw new ValidationError(
-      "Bid rejected: Amount is lower than current highest bid or auction closed"
-    );
-  }
-
-  // 3. Log Timeline event
-  await Timeline.create({
-    auction: auctionId,
-    type: "BID_PLACED",
-    message: `New highest bid of $${amount} placed`,
-    metadata: {
-      bidder: bidderId,
-      amount,
-      bidId: bidDoc._id,
-    },
-  });
-
-  return {
-    auction: updatedAuction,
-    bid: bidDoc,
-  };
 }
 
 /**

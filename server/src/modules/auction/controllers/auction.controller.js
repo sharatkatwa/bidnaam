@@ -14,9 +14,13 @@ import {
   deleteAuction,
 } from "../dao/auction.dao.js";
 import Timeline from "../../../models/timeline.model.js";
+import {
+  uploadToImageKit,
+  uploadMultipleToImageKit,
+} from "../../../shared/utils/imagekit.util.js";
 
 /**
- * Create a new auction listing
+ * Create a new auction listing with optional ImageKit image upload
  */
 export const createAuctionController = asyncHandler(async (req, res) => {
   const {
@@ -41,11 +45,26 @@ export const createAuctionController = asyncHandler(async (req, res) => {
   const now = new Date();
   const status = start <= now ? "active" : "upcoming";
 
+  // Process image uploads via ImageKit if files are provided in request
+  let imageUrls = [];
+  if (req.files && req.files.length > 0) {
+    imageUrls = await uploadMultipleToImageKit(req.files, "/auctions");
+  } else if (req.file) {
+    const uploaded = await uploadToImageKit(
+      req.file.buffer,
+      req.file.originalname,
+      "/auctions"
+    );
+    imageUrls = [uploaded.url];
+  } else if (images) {
+    imageUrls = Array.isArray(images) ? images : [images];
+  }
+
   const auction = await createAuction({
     seller: sellerId,
     title,
     description: description || "",
-    images: images || [],
+    images: imageUrls,
     startPrice: Number(startPrice),
     minimumIncrement: minimumIncrement ? Number(minimumIncrement) : 1,
     status,
@@ -172,6 +191,18 @@ export const updateAuctionController = asyncHandler(async (req, res) => {
   const updateData = { ...req.body };
   delete updateData.seller;
   delete updateData.currentHighestBid;
+
+  // Process image updates if files provided
+  if (req.files && req.files.length > 0) {
+    updateData.images = await uploadMultipleToImageKit(req.files, "/auctions");
+  } else if (req.file) {
+    const uploaded = await uploadToImageKit(
+      req.file.buffer,
+      req.file.originalname,
+      "/auctions"
+    );
+    updateData.images = [uploaded.url];
+  }
 
   const updatedAuction = await updateAuction(id, updateData);
 

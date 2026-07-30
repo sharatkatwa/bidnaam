@@ -15,7 +15,10 @@ export const env = {
     MONGODB_URI: required("MONGODB_URI", "mongodb://localhost:27017/bidnaam"),
     PORT: process.env.PORT || 3001,
     NODE_ENV: process.env.NODE_ENV || "development",
-    CLIENT_URL: process.env.CLIENT_URL || "http://localhost:5173"
+    CLIENT_URL: process.env.CLIENT_URL || "http://localhost:5173",
+    IMAGEKIT_PUBLIC_KEY: process.env.IMAGEKIT_PUBLIC_KEY || "",
+    IMAGEKIT_PRIVATE_KEY: process.env.IMAGEKIT_PRIVATE_KEY || "",
+    IMAGEKIT_URL_ENDPOINT: process.env.IMAGEKIT_URL_ENDPOINT || "",
 }
 
-export const isProduction = env.NODE_ENV === 'production' 
+export const isProduction = env.NODE_ENV === 'production'
